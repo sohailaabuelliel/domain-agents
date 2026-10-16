@@ -1,0 +1,9 @@
+- question: Does fluconazole interact with warfarin?
+  answer: >
+    {"summary": "Yes. Fluconazole can raise warfarin exposure and INR, increasing bleeding risk [S1][S2].",
+     "findings": [{"title": "Fluconazole + warfarin", "detail": "Label advises close INR monitoring and possible warfarin dose adjustment by the prescriber [S1].", "severity": "high", "sources": ["S1", "S2"]}],
+     "limitations": "Magnitude varies between patients; sources do not give a patient-specific dose."}
+- question: What are the side effects of a drug that is not in the sources?
+  answer: >
+    {"summary": "No evidence found in the available sources for this question.",
+     "findings": [], "limitations": "The knowledge base has no document about this medicine, so nothing can be stated without guessing."}
