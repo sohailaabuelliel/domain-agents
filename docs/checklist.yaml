@@ -1,0 +1,36 @@
+# Single source of truth for "what the task asks and where it lives". Rendered by the web UI (Checklist tab).
+# status: done | partial | todo   — updated as each sub-task is finished.
+groups:
+  - title: Core requirements (from the task PDF)
+    items:
+      - {id: agent, text: "One AI agent: takes a question, searches a knowledge base, returns a structured answer", status: done, where: "domain_agent/agent.py", doc: "docs/ARCHITECTURE.md"}
+      - {id: llm, text: "LLM integration — provider-neutral (Gemini default; OpenAI / Azure OpenAI by config)", status: done, where: "domain_agent/llm.py", doc: "docs/DESIGN.md"}
+      - {id: rag, text: "RAG over a real knowledge base (chunking, embeddings, hybrid semantic + BM25 search)", status: done, where: "domain_agent/retrieval.py", doc: "docs/DESIGN.md"}
+      - {id: prompt, text: "Prompt engineering: domain system prompt + few-shot examples + fixed JSON output format", status: done, where: "domains/*/domain.yaml, few_shots.yaml", doc: "docs/DESIGN.md"}
+      - {id: guard, text: "Guardrails: refuse diagnosis / individual dosing, injection defence, cite sources, 'no evidence found'", status: done, where: "domain_agent/guardrails.py", doc: "docs/GUARDRAILS.md"}
+      - {id: conf, text: "Confidence score computed from real signals (retrieval, breadth, citations, grounding)", status: done, where: "domain_agent/guardrails.py", doc: "docs/GUARDRAILS.md"}
+  - title: Domain adaptation (same engine, 5 sectors, config only)
+    items:
+      - {id: d_pharma, text: "Pharma / drug safety (FDA labels + PubMed)", status: done, where: "domains/pharma/", doc: "docs/domains/pharma.md"}
+      - {id: d_medical, text: "Medical / clinical guidelines", status: todo, where: "domains/medical/", doc: ""}
+      - {id: d_finance, text: "Finance / company reports", status: todo, where: "domains/finance/", doc: ""}
+      - {id: d_marketing, text: "Marketing / campaign insights", status: todo, where: "domains/marketing/", doc: ""}
+      - {id: d_hospitality, text: "Hospitality / guest reviews", status: todo, where: "domains/hospitality/", doc: ""}
+  - title: Evaluation
+    items:
+      - {id: eval_sets, text: "Golden question sets per domain (answerable, unanswerable, dangerous)", status: todo, where: "domains/*/eval.yaml", doc: "docs/EVALUATION.md"}
+      - {id: eval_run, text: "Runner reporting retrieval accuracy, answer accuracy, hallucination rate, refusal rate", status: todo, where: "eval/run_eval.py", doc: "docs/EVALUATION.md"}
+  - title: Bonus features
+    items:
+      - {id: b_chat, text: "Chat interface (this web UI)", status: partial, where: "web/", doc: "docs/BONUS.md"}
+      - {id: b_pubmed, text: "Live PubMed search tool", status: done, where: "domain_agent/tools.py", doc: "docs/BONUS.md"}
+      - {id: b_bilingual, text: "Bilingual Arabic / English answers", status: partial, where: "domain_agent/agent.py", doc: "docs/BONUS.md"}
+      - {id: b_multi, text: "Multi-agent: answer agent + independent safety reviewer", status: done, where: "domain_agent/agent.py (_review)", doc: "docs/BONUS.md"}
+      - {id: b_memory, text: "Conversation memory + user preferences", status: todo, where: "domain_agent/memory.py", doc: "docs/BONUS.md"}
+      - {id: b_filesearch, text: "Alternative RAG backend: Gemini File Search", status: partial, where: "domain_agent/retrieval.py", doc: "docs/DESIGN.md"}
+  - title: Deliverables
+    items:
+      - {id: repo, text: "Public GitHub repository, no secrets", status: todo, where: "repo root", doc: "README.md"}
+      - {id: arch, text: "Architecture diagram", status: todo, where: "docs/ARCHITECTURE.md", doc: ""}
+      - {id: doc, text: "Short document: decisions, trade-offs, scaling plan", status: todo, where: "docs/DESIGN.md", doc: ""}
+      - {id: video, text: "Demo video script", status: todo, where: "docs/DEMO_SCRIPT.md", doc: ""}

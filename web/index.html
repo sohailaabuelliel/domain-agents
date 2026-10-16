@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Domain Agents</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E◈%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<aside id="side">
+  <div class="brand"><span class="logo">◈</span><div><b>Domain Agents</b><small>one engine · five sectors</small></div></div>
+  <div class="label">AGENTS</div>
+  <nav id="agents"></nav>
+  <div class="label">PROJECT</div>
+  <nav>
+    <a class="nav" data-view="checklist">✅ Checklist &amp; spec</a>
+    <a class="nav" data-view="docs">📄 Documentation</a>
+  </nav>
+  <button id="openSettings" class="keybtn"><span id="keyDot" class="dot off"></span> API settings</button>
+</aside>
+
+<main>
+  <header id="head"></header>
+
+  <section id="view-chat" class="view">
+    <div id="info" class="info"></div>
+    <div id="msgs"></div>
+    <div id="examples" class="chips"></div>
+    <form id="form">
+      <select id="lang" title="Answer language"><option value="auto">Auto</option><option value="en">English</option><option value="ar">العربية</option></select>
+      <label class="tog" title="Second agent reviews the answer for safety"><input type="checkbox" id="review" checked> reviewer</label>
+      <textarea id="q" rows="1" placeholder="Ask this agent a question…"></textarea>
+      <button id="send">Send</button>
+    </form>
+  </section>
+
+  <section id="view-checklist" class="view hidden"><div id="checklist"></div></section>
+  <section id="view-docs" class="view hidden"><div id="docsWrap"><nav id="docsNav"></nav><article id="docBody" class="md"></article></div></section>
+</main>
+
+<div id="modal" class="modal hidden">
+  <div class="card">
+    <h3>API settings</h3>
+    <p class="muted">Your key is kept in this browser tab only (sessionStorage) and sent with each request. It is never saved on the server or in the repo.</p>
+    <label>Provider
+      <select id="provider"><option value="gemini">Google Gemini (default)</option><option value="openai">OpenAI</option><option value="azure">Azure OpenAI</option></select>
+    </label>
+    <label>API key <input id="apikey" type="password" placeholder="paste key — or leave empty to use the server's .env" autocomplete="off"></label>
+    <label>Model <input id="model" placeholder="default: gemini-3.5-flash / gpt-4o-mini / your Azure deployment name"></label>
+    <label id="azureRow" class="hidden">Azure endpoint <input id="endpoint" placeholder="https://YOUR-RESOURCE.openai.azure.com"></label>
+    <div class="row"><button id="testKey" type="button" class="ghost">Test connection</button><span id="testOut" class="muted"></span></div>
+    <div class="row end"><button id="closeSettings" type="button">Done</button></div>
+  </div>
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>
