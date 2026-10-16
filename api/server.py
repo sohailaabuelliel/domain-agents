@@ -21,11 +21,13 @@ from pydantic import BaseModel
 from domain_agent.agent import DomainAgent, build_agent
 from domain_agent.config import ROOT, LLMConfig, MissingCredentials, list_domains, load_domain
 from domain_agent.llm import make_llm
+from domain_agent.memory import MemoryStore
 
 app = FastAPI(title="Domain Agents", version="1.0")
 WEB = ROOT / "web"
 _agents: dict[tuple, DomainAgent] = {}
 _lock = threading.Lock()
+MEMORY = MemoryStore()
 
 
 class LLMSettings(BaseModel):
@@ -43,6 +45,7 @@ class AskBody(BaseModel):
     backend: str = "hybrid"
     llm: LLMSettings = LLMSettings()
     history: list[dict[str, Any]] = []
+    session_id: str = "anon"
 
 
 def _cfg(s: LLMSettings) -> LLMConfig:
@@ -111,9 +114,14 @@ async def ask(body: AskBody):
     def worker():
         try:
             agent = get_agent(body)
+            mem = MEMORY.get(body.session_id)
+            learned = mem.learn(body.question)
+            if learned:
+                q.put(("trace", {"t": 0, "type": "memory_learned", "items": learned}))
             q.put(("start", {"domain": body.domain, "provider": agent.llm.provider, "model": agent.llm.model}))
-            res = agent.ask(body.question, body.language, body.history, body.review, emit=lambda e: q.put(("trace", e)))
-            q.put(("result", res.to_dict()))
+            res = agent.ask(body.question, body.language, body.history, body.review, emit=lambda e: q.put(("trace", e)), memory_note=mem.note())
+            out = res.to_dict(); out["memory"] = mem.public()
+            q.put(("result", out))
         except MissingCredentials as e:
             q.put(("fatal", {"code": "missing_key", "message": str(e)}))
         except Exception as e:  # noqa: BLE001
@@ -131,6 +139,17 @@ async def ask(body: AskBody):
                 break
 
     return StreamingResponse(stream(), media_type="text/event-stream", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
+@app.get("/api/memory/{session_id}")
+def get_memory(session_id: str):
+    return {"preferences": MEMORY.get(session_id).public()}
+
+
+@app.delete("/api/memory/{session_id}")
+def clear_memory(session_id: str):
+    MEMORY.clear(session_id)
+    return {"preferences": []}
 
 
 @app.get("/")

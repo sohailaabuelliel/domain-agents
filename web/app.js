@@ -2,6 +2,12 @@
 const $ = (s, r = document) => r.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const state = { domains: [], cur: null, history: {}, busy: false };
+const SID = sessionStorage.getItem("sid") || (() => { const v = (crypto.randomUUID?.() || String(Math.random()).slice(2)); sessionStorage.setItem("sid", v); return v; })();
+function renderMemory(prefs) {
+  const el = $("#memory"); if (!el) return;
+  el.innerHTML = prefs && prefs.length ? `<span class="mem-title">🧠 Remembered:</span> ` + prefs.map(p => `<span class="chip mem">${esc(p.label)}: ${esc(p.value)}</span>`).join("") + ` <button id="memclear" class="link">forget</button>` : "";
+  $("#memclear")?.addEventListener("click", async () => { await fetch("/api/memory/" + SID, { method: "DELETE" }); renderMemory([]); });
+}
 
 // ---------- settings (key lives only in sessionStorage) ----------
 const S = {
@@ -53,6 +59,7 @@ function openAgent(id) {
 // ---------- chat ----------
 const isAr = s => (s.match(/[\u0600-\u06FF]/g) || []).length > s.length * 0.3;
 function traceLine(e) {
+  if (e.type === "memory_learned") return `<div class="tl">🧠 <b>memory</b> learned: ${esc(e.items.join(" · "))}</div>`;
   const f = {
     guard_input: e => e.ok ? "✓ input guardrails passed" : `⛔ blocked by <b>${esc(e.rule)}</b>`,
     thought: e => `💭 ${esc(e.text).slice(0, 120)}`,
@@ -109,7 +116,7 @@ async function ask(question) {
   let result = null;
   try {
     const resp = await fetch("/api/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
-      domain: d.id, question, language: $("#lang").value, review: $("#review").checked, llm: S.get(),
+      domain: d.id, question, language: $("#lang").value, review: $("#review").checked, llm: S.get(), session_id: SID,
       history: hist.filter(m => m.role).map(m => ({ role: m.role, text: m.text })) }) });
     const reader = resp.body.getReader(), dec = new TextDecoder(); let buf = "";
     for (;;) {
@@ -119,7 +126,7 @@ async function ask(question) {
         const block = buf.slice(0, i); buf = buf.slice(i + 2);
         const ev = /event: (\w+)/.exec(block)?.[1], data = JSON.parse(/data: (.*)/s.exec(block)?.[1] || "{}");
         if (ev === "trace") { tr.insertAdjacentHTML("beforeend", traceLine(data)); box.scrollIntoView({ block: "end" }); }
-        if (ev === "result") result = data;
+        if (ev === "result") { result = data; renderMemory(data.memory); }
         if (ev === "fatal") { result = { status: "error", message: data.message, sources: [], confidence: null }; if (data.code === "missing_key") $("#modal").classList.remove("hidden"); }
       }
     }

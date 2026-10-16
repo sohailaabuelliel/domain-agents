@@ -73,3 +73,5 @@ details{margin-top:8px}summary{cursor:pointer;color:var(--mut);font-size:13px}
 .md pre{background:#10212b;color:#d7e6ee;padding:12px;border-radius:9px;overflow:auto}.md pre code{background:none}
 .md table{border-collapse:collapse}.md td,.md th{border:1px solid var(--line);padding:5px 10px}
 @media(max-width:800px){aside{display:none}.view{padding:12px}}
+
+.memory{padding:6px 18px 0;font-size:13px;color:var(--mut)}.memory:empty{display:none}.chip.mem{background:#eef6ff;border-color:#cfe2f7;margin:0 4px}.link{background:none;border:0;color:var(--acc);cursor:pointer;font-size:13px}
