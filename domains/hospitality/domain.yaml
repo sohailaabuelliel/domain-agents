@@ -48,7 +48,7 @@ guardrails:
     - id: fake_reviews
       description: Writing fake reviews or manipulating ratings.
       patterns:
-        - "\\b(write|generate|post) (a )?(fake|fraudulent) review|delete (the )?negative reviews|buy (positive )?reviews\\b"
+        - "\\b((write|generate|post|create|make)\\b.{0,25}\\b(fake|fraudulent|false)\\b.{0,15}\\breviews?|delete (the )?negative reviews|buy (positive )?reviews)"
         - "\\b(ريفيو مزيف|امسح الريفيوهات)\\b"
       response: >
         I can't help create fake reviews or hide genuine feedback. I can help you respond to guests honestly and fix

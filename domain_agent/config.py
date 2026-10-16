@@ -24,7 +24,7 @@ DEFAULT_MODELS = {
     "openai": "gpt-4o-mini",
     "azure": "gpt-4o-mini",  # for Azure this is the *deployment name*
 }
-GEMINI_FALLBACK_MODELS = ["gemini-2.5-flash"]  # used only when the primary returns 429/503
+GEMINI_FALLBACK_MODELS = ["gemini-3.5-flash-lite", "gemini-2.5-flash"]  # used only when the primary returns 429/503
 
 
 def load_dotenv(path: Path | None = None) -> None:

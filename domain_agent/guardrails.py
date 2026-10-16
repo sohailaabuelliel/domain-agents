@@ -44,6 +44,10 @@ def check_input(question: str, domain: DomainConfig) -> InputVerdict:
     return InputVerdict(True)
 
 
+_COMMON_CAPS = {m.lower() for m in ("January February March April May June July August September October November December "
+                "Monday Tuesday Wednesday Thursday Friday Saturday Sunday Ramadan Eid English Arabic Instagram TikTok Google").split()}
+
+
 def uncovered_terms(question: str, bm25: BM25) -> list[str]:
     """Proper-noun-looking words in the question that appear NOWHERE in the knowledge base.
 
@@ -55,7 +59,7 @@ def uncovered_terms(question: str, bm25: BM25) -> list[str]:
     for i, w in enumerate(words):
         starts_sentence = question.find(w) == 0
         if (w[0].isupper() and not starts_sentence) or (w[0].isupper() and w.lower() not in bm25.idf and not starts_sentence):
-            if w.lower() not in bm25.idf and w.lower() not in {t.lower() for t in out}:
+            if w.lower() not in _COMMON_CAPS and w.lower() not in bm25.idf and w.lower() not in {t.lower() for t in out}:
                 out.append(w)
     return out
 

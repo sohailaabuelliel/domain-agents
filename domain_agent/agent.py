@@ -150,6 +150,13 @@ class DomainAgent:
             final_msgs = ([Msg("user", f"QUESTION: {question}\n\nSOURCES (the only facts you may use):\n{evidence_block}\n\nReturn the JSON answer.")])
             ans, ver = self._answer_and_verify(system, final_msgs, ctx, ev, add_usage)
 
+            # ---- 5b. an answer that cites nothing is not an answer: say "no evidence" instead of showing filler
+            if self.domain.guardrails.get("require_citations", True) and not ver.cited_ids:
+                ev("no_evidence", reason="answer cited no source")
+                return AgentResult("no_evidence", message="I couldn't find this in the knowledge base, so I won't guess — no evidence found. Try rephrasing, or ask about a topic covered by the documents.",
+                                   trace=trace, usage=usage, elapsed=round(time.time() - t0, 2),
+                                   confidence={"score": 0.0, "level": "n/a", "parts": {}, "reasons": ["Answer contained no cited evidence"]})
+
             # ---- 6. safety reviewer (second agent)
             rev_out = None
             if review:

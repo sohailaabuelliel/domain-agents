@@ -62,6 +62,8 @@ def _retry(fn: Callable[[], Any], attempts: int = 4, base: float = 2.0) -> Any:
             return fn()
         except Exception as e:  # noqa: BLE001 - provider SDKs raise many types
             msg = str(e)
+            if "PerDay" in msg:      # daily quota: waiting is pointless, let the caller switch model at once
+                raise
             transient = any(t in msg for t in ("429", "500", "502", "503", "504", "UNAVAILABLE", "RESOURCE_EXHAUSTED", "timed out", "Timeout", "overloaded"))
             if not transient or i == attempts - 1:
                 raise
@@ -155,7 +157,10 @@ class GeminiLLM(LLM):
         last: Exception | None = None
         for model in models:
             try:
-                return _retry(lambda: self._call(model, system, messages, tools, schema, temperature), attempts=3)
+                r = _retry(lambda: self._call(model, system, messages, tools, schema, temperature), attempts=3)
+                if model != models[0]:
+                    print(f"[llm] primary model unavailable, answered with fallback {model}", flush=True)
+                return r
             except Exception as e:  # noqa: BLE001
                 last = e
                 if not any(t in str(e) for t in ("429", "503", "UNAVAILABLE", "RESOURCE_EXHAUSTED")):
