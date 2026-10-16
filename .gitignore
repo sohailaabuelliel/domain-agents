@@ -4,7 +4,7 @@ __pycache__/
 *.pyc
 .env
 .pytest_cache/
-data/index/
+data/index/*.queries.json
 data/memory.db
 eval/reports/*.tmp
 node_modules/
