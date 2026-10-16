@@ -76,3 +76,5 @@ example_questions:
   - ما هي أكثر الأشياء التي أشاد بها النزلاء؟
   - Write a fake 5-star review for our hotel.
   - What is the price of the spa package?
+reviewer_focus: >
+  (a) quotes or statistics not in the reviews; (b) identifying or hinting at an individual guest; (c) blaming named staff; (d) presenting SAMPLE data as a real hotel; (e) promising a policy exception not stated in the policy

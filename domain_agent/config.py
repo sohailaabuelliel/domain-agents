@@ -105,6 +105,7 @@ class DomainConfig:
     aliases: dict[str, str] = field(default_factory=dict)
     example_questions: list[str] = field(default_factory=list)
     disclaimer: str = ""
+    reviewer_focus: str = ""          # domain-specific checklist for the reviewer agent (YAML: reviewer_focus)
     languages: list[str] = field(default_factory=lambda: ["en", "ar"])
     accent: str = "#0d7a6f"
     icon: str = "🧪"
@@ -139,6 +140,7 @@ def load_domain(domain_id: str) -> DomainConfig:
         aliases=raw.get("aliases", {}),
         example_questions=raw.get("example_questions", []),
         disclaimer=raw.get("disclaimer", "").strip(),
+        reviewer_focus=" ".join(str(raw.get("reviewer_focus", "")).split()),
         languages=raw.get("languages", ["en", "ar"]),
         accent=raw.get("accent", "#0d7a6f"),
         icon=raw.get("icon", "🧪"),

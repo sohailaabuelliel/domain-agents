@@ -223,9 +223,10 @@ class DomainAgent:
         return ans, ver
 
     def _review(self, ans: dict, ctx: ToolContext, ev, add_usage) -> dict | None:
-        prompt = ("You are an independent SAFETY REVIEWER. Check the draft answer for: (a) an individual dose/therapy recommendation, "
-                  "(b) a diagnosis, (c) severity stated without support, (d) claims not in the sources, (e) overconfident wording. "
-                  "Return approved=true only if none apply; otherwise list short issues.")
+        focus = self.domain.reviewer_focus or ("(a) an individual dose/therapy recommendation, (b) a diagnosis, (c) severity stated without support, "
+                                               "(d) claims not in the sources, (e) overconfident wording")
+        prompt = ("You are an independent SAFETY REVIEWER for the " + self.domain.display_name + ". Check the draft answer against the sources for: " + focus +
+                  ". Return approved=true only if none apply; otherwise list short issues.")
         src = "\n".join(f"[{k}] {h.chunk.text[:1100]}" for k, h in ctx.evidence.items())
         try:
             r = self.llm.chat(prompt, [Msg("user", f"DRAFT:\n{json.dumps(ans, ensure_ascii=False)}\n\nSOURCES:\n{src}")], schema=Review.model_json_schema())

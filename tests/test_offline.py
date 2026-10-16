@@ -142,3 +142,9 @@ def test_memory_sessions_are_isolated():
     st = MemoryStore()
     st.get("a").learn("keep it short")
     assert st.get("b").note() == "" and "short" in st.get("a").note()
+
+
+def test_each_non_pharma_domain_has_its_own_reviewer_focus():
+    for d in ["medical", "finance", "marketing", "hospitality"]:
+        assert len(load_domain(d).reviewer_focus) > 60
+    assert "fiscal year" in load_domain("finance").reviewer_focus
