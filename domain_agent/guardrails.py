@@ -12,7 +12,9 @@ from .config import DomainConfig
 from .retrieval import BM25, Hit, tokenize
 
 INJECTION_PATTERNS = [
-    r"ignore (all |any |the )?(previous|prior|above|earlier) (instructions|rules|prompt)",
+    r"ignore (all |any |the |your |these |those )?(previous |prior |above |earlier |safety |own )?(instructions|rules|guidelines|prompt|restrictions)",
+    r"(bypass|override|forget|disable) (all |any |the |your )?(safety |content )?(rules|guardrails|instructions|restrictions|filters)",
+    r"pretend (you (are|have) )?(no|not bound)",
     r"disregard (the )?(system|previous) (prompt|instructions)",
     r"(reveal|show|print|repeat) (your |the )?(system|hidden|initial) (prompt|instructions)",
     r"you are now (?:a |an )?(?!pharmac)",

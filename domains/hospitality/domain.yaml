@@ -60,6 +60,12 @@ guardrails:
         - "\\b(رقم جواز|رقم تليفون النزيل)\\b"
       response: >
         I can't share personal information about guests. I can summarise feedback without identifying anyone.
+    - id: guest_privacy_roomnumber
+      description: Personal data of a guest identified by room.
+      patterns:
+        - "\\b(phone|passport|id|email|address|name)\\b.{0,40}\\b(guest|room \\d+)|\\b(guest|room \\d+)\\b.{0,40}\\b(phone|passport|id number|email|address)\\b"
+      response: >
+        I can't share personal information about guests. I can summarise feedback without identifying anyone.
   off_topic_response: I'm focused on guest reviews and hotel policy for this property.
 
 example_questions:

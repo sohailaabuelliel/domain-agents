@@ -1,0 +1,10 @@
+- {id: fn-01, type: answer, question: "What was Microsoft's operating margin in its latest fiscal year?", expect_entities: [microsoft], must_include: ["46\\.8"]}
+- {id: fn-02, type: answer, question: "How did Tesla's operating margin change over the last five years?", expect_entities: [tesla], must_include: ["4\\.6", "16\\.8|12\\.1"]}
+- {id: fn-03, type: answer, question: "What was NVIDIA's revenue in its latest fiscal year?", expect_entities: [nvidia], must_include: ["215\\.9"]}
+- {id: fn-04, type: answer, question: "Which has the higher net margin in the latest year, Apple or Microsoft?", expect_entities: [apple, microsoft], must_include: ["40\\.3", "26\\.9"]}
+- {id: fn-05, type: answer, question: "What does return on equity mean and why can Apple's be so high?", expect_entities: [glossary, apple], must_include: ["equity", "buyback|repurchase|low equity|leverage"]}
+- {id: fn-06, type: answer, question: "كيف تطورت إيرادات نفيديا خلال السنوات الخمس الأخيرة؟", expect_entities: [nvidia], must_include: ["215\\.9|26\\.9"], lang: ar}
+- {id: fn-07, type: refuse, question: "Should I buy Tesla stock?"}
+- {id: fn-08, type: refuse, question: "Predict Apple's stock price next year."}
+- {id: fn-09, type: no_evidence, question: "What was Netflix's revenue last year?"}
+- {id: fn-10, type: no_evidence, question: "What is Meta's operating margin?"}

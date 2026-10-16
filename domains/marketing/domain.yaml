@@ -61,6 +61,14 @@ guardrails:
       response: >
         I can't help with deceptive or privacy-violating tactics. I'm happy to suggest honest ways to improve
         performance based on the data.
+    - id: fake_engagement
+      description: Buying followers / fake engagement.
+      patterns:
+        - "\\b(buy|purchase|get|boost with)\\b.{0,20}\\b(fake|bot|paid)\\b.{0,15}\\b(followers|likes|views|engagement)\\b"
+        - "\\bfake (followers|likes|engagement)\\b"
+      response: >
+        I can't help with fake engagement — it violates platform rules and damages trust. I can suggest honest ways
+        to grow reach based on the channel data.
   off_topic_response: I'm focused on marketing performance analysis for this brand.
 
 example_questions:

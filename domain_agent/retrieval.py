@@ -173,6 +173,7 @@ class HybridRetriever(Retriever):
 
     def __init__(self, domain: DomainConfig, llm: LLM, rebuild: bool = False):
         self.domain, self.llm = domain, llm
+        self.degraded = ""
         self.chunks = load_chunks(domain.knowledge_dir)
         if not self.chunks:
             raise RuntimeError(f"No knowledge files found in {domain.knowledge_dir}")
@@ -206,12 +207,36 @@ class HybridRetriever(Retriever):
                 "entities": len(self._entities), "doc_types": dict(types), "embedding_dim": int(self.matrix.shape[1])}
 
     # -- search --
+    def _query_vector(self, query: str) -> np.ndarray | None:
+        """Query embedding with an on-disk cache (repeat questions cost no API quota).
+        Returns None when the embedding service is unavailable (daily quota, outage) -> caller degrades to BM25."""
+        cache_file = INDEX_DIR / f"{self.domain.collection}.queries.json"
+        key = hashlib.sha1(query.strip().lower().encode()).hexdigest()
+        try:
+            cache = json.loads(cache_file.read_text()) if cache_file.exists() else {}
+        except Exception:  # noqa: BLE001
+            cache = {}
+        if key in cache:
+            return np.array(cache[key], dtype=np.float32)
+        try:
+            v = self.llm.embed([query], kind="query")[0]
+        except Exception as e:  # noqa: BLE001
+            self.degraded = f"{type(e).__name__}: {str(e)[:120]}"
+            return None
+        self.degraded = ""
+        cache[key] = [round(float(x), 6) for x in v]
+        cache_file.write_text(json.dumps(cache))
+        return np.array(v, dtype=np.float32)
+
     def _rank(self, query: str, pool: np.ndarray) -> list[Hit]:
-        q = np.array(self.llm.embed([query], kind="query")[0], dtype=np.float32)
-        q /= max(float(np.linalg.norm(q)), 1e-9)
-        cos = self.matrix @ q
+        q = self._query_vector(query)
         bm = self.bm25.scores(tokenize(query))
         bm_n = bm / bm.max() if bm.max() > 0 else bm
+        if q is None:   # DEGRADED MODE: keyword-only. cosine is replaced by a conservative proxy so guardrails still work.
+            cos = 0.35 + 0.45 * bm_n
+        else:
+            q = q / max(float(np.linalg.norm(q)), 1e-9)
+            cos = self.matrix @ q
         idx = np.where(pool)[0]
         v_rank = {int(i): r for r, i in enumerate(idx[np.argsort(-cos[idx])])}
         b_rank = {int(i): r for r, i in enumerate(idx[np.argsort(-bm[idx])])}
