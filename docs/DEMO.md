@@ -46,3 +46,6 @@ Open **Checklist & spec** (requirement → where it is implemented) and the eval
 | "quota" / 429 message | Free-tier daily limit | Paste a billed key; the agent already falls back to a lighter model |
 | Very slow first answer | Cold start / model queue | Wait; the trace shows progress |
 | Arabic question → "no evidence" | Arabic vs English similarity under threshold | Rephrase with the English term, or see `EVALUATION.md` |
+
+## Recorded demo
+A 1-minute recording of the real UI is in [`media/demo.mp4`](media/demo.mp4).
