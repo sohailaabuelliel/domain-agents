@@ -30,7 +30,7 @@ groups:
       - {id: b_filesearch, text: "Alternative RAG backend: Gemini File Search", status: partial, where: "domain_agent/retrieval.py", doc: "docs/DESIGN.md"}
   - title: Deliverables
     items:
-      - {id: repo, text: "Public GitHub repository, no secrets", status: todo, where: "repo root", doc: "README.md"}
+      - {id: repo, text: "Public GitHub repository, no secrets", status: done, where: "github.com/sohailaabuelliel/domain-agents", doc: "README.md"}
       - {id: arch, text: "Architecture diagram", status: done, where: "docs/ARCHITECTURE.md", doc: "docs/ARCHITECTURE.md"}
       - {id: doc, text: "Short document: decisions, trade-offs, scaling plan", status: done, where: "docs/DESIGN.md", doc: "docs/DESIGN.md"}
       - {id: video, text: "Demo video script", status: done, where: "docs/DEMO.md", doc: "docs/DEMO.md"}
