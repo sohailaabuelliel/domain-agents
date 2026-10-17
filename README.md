@@ -2,7 +2,9 @@
 
 [![tests](https://github.com/sohailaabuelliel/domain-agents/actions/workflows/tests.yml/badge.svg)](https://github.com/sohailaabuelliel/domain-agents/actions)
 
-**▶ 1-minute demo video:** [`docs/media/demo.mp4`](docs/media/demo.mp4) — recorded from the real running UI (new design): a cited Pharma answer, a guardrail refusal, an honest "no evidence", an Arabic question over English SEC filings, the English/Arabic UI switch, Settings with the live model list, and the built-in checklist/docs. Waiting time while the agent works is shown at 8× speed and labelled on screen.
+[![Watch the 1-minute demo on YouTube](docs/media/demo-poster.jpg)](https://youtu.be/szaER-aEya4)
+
+**▶ [Watch the 1-minute demo on YouTube](https://youtu.be/szaER-aEya4)** — recorded from the real running UI: a cited Pharma answer, a guardrail refusal, an honest "no evidence", an Arabic question over English SEC filings, the English/Arabic UI switch, Settings with the live model list, and the built-in checklist/docs. Waiting time while the agent works is shown at 8× speed and labelled on screen. (Original file: [`docs/media/demo.mp4`](docs/media/demo.mp4).)
 
 ![A cited Pharma answer: severity, sources and a measured confidence score](docs/media/screenshots/02-pharma-answer.png)
 
