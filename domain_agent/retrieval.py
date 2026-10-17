@@ -190,8 +190,11 @@ class HybridRetriever(Retriever):
         meta = INDEX_DIR / f"{self.domain.collection}.json"
         if npz.exists() and meta.exists() and not rebuild:
             if json.loads(meta.read_text()).get("fingerprint") == fp:
-                return np.load(npz)["m"]
+                m = np.load(npz)["m"]
+                if m.shape[0] == len(self.chunks):
+                    return m
         vecs = np.array(self.llm.embed([c.text for c in self.chunks], kind="document"), dtype=np.float32)
+        assert vecs.shape[0] == len(self.chunks), f"index shape {vecs.shape} != {len(self.chunks)} chunks"
         vecs /= np.maximum(np.linalg.norm(vecs, axis=1, keepdims=True), 1e-9)
         np.savez_compressed(npz, m=vecs)
         meta.write_text(json.dumps({"fingerprint": fp, "chunks": len(self.chunks), "embed": embed_id}))

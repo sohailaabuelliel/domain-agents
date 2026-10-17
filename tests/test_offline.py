@@ -148,3 +148,21 @@ def test_each_non_pharma_domain_has_its_own_reviewer_focus():
     for d in ["medical", "finance", "marketing", "hospitality"]:
         assert len(load_domain(d).reviewer_focus) > 60
     assert "fiscal year" in load_domain("finance").reviewer_focus
+
+
+def test_arabic_answer_on_english_source_is_not_marked_unsupported():
+    src = {"S1": _hit("Fluconazole increases warfarin exposure and the INR; monitor closely. Dose reduction of 25 percent may be needed.")}
+    ar = {"summary": "x", "findings": [_f("يزيد الفلوكونازول من تأثير الوارفارين ويرفع INR [S1].", ["S1"])]}
+    v = verify_answer(ar, src)
+    assert v.weak_findings == [] and v.valid_citations
+
+
+def test_arabic_claim_with_wrong_number_is_still_caught():
+    src = {"S1": _hit("Fluconazole increases warfarin exposure; reduce the dose by 25 percent.")}
+    ar = {"summary": "x", "findings": [_f("يجب تقليل جرعة Warfarin بنسبة 90 و77 مع Fluconazole [S1].", ["S1"])]}
+    assert verify_answer(ar, src).support <= 0.67
+
+
+def test_english_unsupported_claim_still_weak():
+    v = verify_answer({"summary": "x", "findings": [_f("The moon is made of green cheese and bananas.", ["S1"])]}, {"S1": _hit()})
+    assert v.weak_findings == [0] or v.support < 0.35

@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 import re
+import os
 import time
 import uuid
 from dataclasses import dataclass, field
@@ -90,7 +91,7 @@ class LLM:
 # ---------------------------------------------------------------- Gemini
 class GeminiLLM(LLM):
     provider = "gemini"
-    EMBED_MODEL = "gemini-embedding-001"
+    EMBED_MODEL = os.environ.get("GEMINI_EMBED_MODEL", "gemini-embedding-2")  # multilingual: Arabic question -> English source works
     EMBED_DIM = 768
 
     def __init__(self, cfg: LLMConfig):
@@ -177,9 +178,12 @@ class GeminiLLM(LLM):
                 time.sleep(61)
             batch = texts[i:i + 90]
             r = _retry(attempts=5, fn=lambda b=batch: self.client.models.embed_content(
-                model=self.EMBED_MODEL, contents=b,
+                model=self.EMBED_MODEL, contents=[types.Content(parts=[types.Part(text=t)]) for t in b],  # one Content per text: embedding-2 would otherwise merge a plain list into ONE vector
                 config=types.EmbedContentConfig(task_type=task, output_dimensionality=self.EMBED_DIM)))
-            vectors += [list(e.values or []) for e in (r.embeddings or [])]
+            got = [list(e.values or []) for e in (r.embeddings or [])]
+            if len(got) != len(batch):
+                raise LLMError(f"embedding model returned {len(got)} vectors for {len(batch)} texts")
+            vectors += got
         return vectors
 
 

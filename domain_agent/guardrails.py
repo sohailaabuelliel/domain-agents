@@ -67,8 +67,25 @@ def uncovered_terms(question: str, bm25: BM25) -> list[str]:
 
 
 # ---------------------------------------------------------------- grounding / faithfulness
+_ARABIC = re.compile(r"[\u0600-\u06FF]")
+_LANG_NEUTRAL = re.compile(r"[A-Za-z][A-Za-z0-9\-]{2,}|\d+(?:[.,]\d+)?")   # Latin terms and numbers survive translation
+
+
 def _support(text: str, sources: list[str]) -> float:
-    """Share of the claim's content words that occur in the cited source text (0..1)."""
+    """Share of the claim's content words that occur in the cited source text (0..1).
+
+    Cross-language case (Arabic answer, English sources): words cannot match, so only language-neutral tokens
+    (numbers, drug/company names in Latin script) are compared. With fewer than two of them the claim cannot be
+    verified lexically, and a deliberately MEDIUM score (0.5) is returned: it neither flags the finding as unsupported
+    nor boosts confidence. Citation validity and the safety reviewer still apply.
+    """
+    src_text = " ".join(sources)
+    if len(_ARABIC.findall(text)) > 0.3 * max(len(re.findall(r"\w", text)), 1) and len(_ARABIC.findall(src_text)) < 0.1 * max(len(src_text), 1):
+        neutral = {t.lower().strip("-") for t in _LANG_NEUTRAL.findall(text)}
+        if len(neutral) < 2:
+            return 0.5
+        src_l = src_text.lower()
+        return max(0.5, sum(1 for t in neutral if t in src_l) / len(neutral))
     claim = set(tokenize(text))
     if not claim:
         return 1.0
