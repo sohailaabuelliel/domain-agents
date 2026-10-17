@@ -4,6 +4,8 @@
 
 **▶ 1-minute demo video:** [`docs/media/demo.mp4`](docs/media/demo.mp4) — recorded from the real running UI (new design): a cited Pharma answer, a guardrail refusal, an honest "no evidence", an Arabic question over English SEC filings, the English/Arabic UI switch, Settings with the live model list, and the built-in checklist/docs. Waiting time while the agent works is shown at 8× speed and labelled on screen.
 
+![A cited Pharma answer: severity, sources and a measured confidence score](docs/media/screenshots/02-pharma-answer.png)
+
 A single agent engine that is re-pointed at a different sector **by configuration only** (YAML + a folder of knowledge files — no code changes). Five sectors ship ready to use:
 
 | Sector | Agent | Knowledge base | Data |
@@ -17,6 +19,21 @@ A single agent engine that is re-pointed at a different sector **by configuratio
 It answers **only from retrieved sources**, cites them, says **"no evidence found"** when it cannot support an answer, refuses out-of-scope requests (dosing, diagnosis, investment advice…), and shows a measured **confidence** score.
 
 **Bonus items included:** multi-agent safety reviewer · conversation memory · live PubMed tool · chat UI with streaming trace · bilingual Arabic/English · swappable LLM provider · evaluation harness. See [docs/BONUS.md](docs/BONUS.md).
+
+## Screenshots
+
+| | |
+|---|---|
+| ![Agent home: what it does, what it refuses](docs/media/screenshots/01-home-pharma.png) | ![Cited answer with severity and confidence](docs/media/screenshots/02-pharma-answer.png) |
+| **Agent home** — what each agent does, what it refuses, its evidence threshold | **Cited answer** — findings graded by severity, every claim linked to a source |
+| ![Sources and confidence breakdown](docs/media/screenshots/03-sources-and-confidence.png) | ![Guardrail refusal](docs/media/screenshots/04-guardrail-refusal.png) |
+| **Sources & confidence** — the retrieved passages and the signals behind the score | **Guardrail** — individual dosing is refused, with the step-by-step agent trace |
+| ![Arabic interface and Arabic answer over English SEC filings](docs/media/screenshots/05-arabic-finance.png) | ![Settings with the live model list](docs/media/screenshots/06-settings-models.png) |
+| **Arabic** — right-to-left interface; an Arabic question answered from English SEC filings | **Settings** — pick a provider, paste your key; the model list loads live |
+| ![Requirements checklist](docs/media/screenshots/07-checklist.png) | ![Documentation with architecture diagram](docs/media/screenshots/08-docs-architecture.png) |
+| **Checklist** — every task requirement mapped to the code and its document | **Docs in the app** — architecture diagrams rendered from the repo |
+
+<p align="center"><img src="docs/media/screenshots/09-mobile.png" alt="Mobile layout" width="280"><br><b>Mobile</b> — the same app on a phone</p>
 
 ## Run it — one command, any system
 
