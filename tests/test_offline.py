@@ -186,3 +186,40 @@ def test_rate_limited_model_is_skipped_not_waited_on(monkeypatch):
     assert f.chat("s", []) == "ok" and calls == ["m1", "m2"]
     calls.clear(); assert f.chat("s", []) == "ok" and calls == ["m2"]   # m1 cooling down: skipped
     L._COOLDOWN.clear()
+
+
+# ------------------------------------------------------------------ settings UI: model list + Arabic UI strings
+def test_model_filter_keeps_chat_models_newest_first():
+    from domain_agent.llm import filter_chat_models
+    ids = ["models/gemini-2.5-flash", "models/text-embedding-004", "models/gemini-3.5-flash", "models/imagen-4",
+           "models/gemini-2.5-flash-preview-tts", "models/gemini-3.5-flash-lite"]
+    assert filter_chat_models("gemini", ids) == ["gemini-3.5-flash", "gemini-3.5-flash-lite", "gemini-2.5-flash"]
+    oa = filter_chat_models("openai", ["gpt-4o-2024-08-06", "gpt-5", "text-embedding-3-small", "dall-e-3", "o3", "whisper-1", "gpt-4o"])
+    assert oa[0] == "gpt-5" and "dall-e-3" not in oa and "whisper-1" not in oa and "text-embedding-3-small" not in oa
+    assert oa.index("gpt-4o") < oa.index("gpt-4o-2024-08-06")   # alias before dated snapshot
+
+
+def test_models_endpoint_asks_for_a_key_instead_of_crashing(monkeypatch):
+    from fastapi.testclient import TestClient
+    import api.server as srv
+    for k in ("GEMINI_API_KEY", "GOOGLE_API_KEY", "OPENAI_API_KEY"):
+        monkeypatch.delenv(k, raising=False)
+    r = TestClient(srv.app).post("/api/models", json={"provider": "openai", "api_key": ""}).json()
+    assert r["ok"] is False and r["models"] == [] and r["error"]
+
+
+@pytest.mark.parametrize("d", DOMAINS)
+def test_every_domain_has_arabic_ui_text(d):
+    cfg = load_domain(d)
+    assert cfg.ui_ar.get("name") and cfg.ui_ar.get("use_case") and cfg.ui_ar.get("disclaimer")
+    assert len(cfg.ui_ar.get("tasks", [])) == len(cfg.tasks)
+
+
+def test_ui_strings_exist_in_both_languages():
+    import re as _re
+    src = (Path(__file__).resolve().parents[1] / "web" / "i18n.js").read_text(encoding="utf-8")
+    en, ar = src.split("\n  ar:", 1)
+    keys = lambda block: set(_re.findall(r'"([a-zA-Z]+\.[\w.]+)":', block))
+    assert keys(en) == keys(ar), keys(en) ^ keys(ar)
+    used = set(_re.findall(r'data-i18n(?:-ph|-title)?="([\w.]+)"', (Path(__file__).resolve().parents[1] / "web" / "index.html").read_text(encoding="utf-8")))
+    assert used <= keys(en), used - keys(en)

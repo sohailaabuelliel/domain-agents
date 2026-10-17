@@ -20,7 +20,7 @@ from pydantic import BaseModel
 
 from domain_agent.agent import DomainAgent, build_agent
 from domain_agent.config import ROOT, LLMConfig, MissingCredentials, list_domains, load_domain
-from domain_agent.llm import make_llm
+from domain_agent.llm import list_models, make_llm
 from domain_agent.memory import MemoryStore
 
 app = FastAPI(title="Domain Agents", version="1.0")
@@ -71,6 +71,7 @@ def domains():
         out.append({"id": c.id, "name": c.display_name, "icon": c.icon, "accent": c.accent, "use_case": c.use_case.strip(),
                     "tasks": c.tasks, "tools": c.tools, "examples": c.example_questions, "disclaimer": c.disclaimer,
                     "documents": n_docs, "min_score": c.min_score,
+                    "ar": c.ui_ar,
                     "blocked_intents": [{"id": b["id"], "description": b.get("description", "")} for b in c.blocked_intents]})
     return out
 
@@ -104,6 +105,29 @@ def test_key(s: LLMSettings):
         return {"ok": False, "error": str(e)}
     except Exception as e:  # noqa: BLE001
         return {"ok": False, "error": str(e)[:300]}
+
+
+_model_cache: dict[tuple, tuple[float, list[str]]] = {}
+
+
+@app.post("/api/models")
+def models(s: LLMSettings):
+    """List the chat models the user's key can use, so the settings dropdown fills itself."""
+    import time
+    try:
+        cfg = _cfg(s).resolved()
+    except MissingCredentials as e:
+        return {"ok": False, "error": str(e), "models": []}
+    key = (cfg.provider, hash(cfg.api_key), cfg.azure_endpoint)
+    hit = _model_cache.get(key)
+    if hit and time.time() - hit[0] < 600:
+        return {"ok": True, "provider": cfg.provider, "models": hit[1], "default": cfg.model}
+    try:
+        ids = list_models(cfg)
+    except Exception as e:  # noqa: BLE001
+        return {"ok": False, "error": f"{type(e).__name__}: {str(e)[:240]}", "models": []}
+    _model_cache[key] = (time.time(), ids)
+    return {"ok": True, "provider": cfg.provider, "models": ids, "default": cfg.model}
 
 
 # ------------------------------------------------------------------ ask (SSE)
@@ -158,3 +182,4 @@ def index():
 
 
 app.mount("/static", StaticFiles(directory=WEB), name="static")
+app.mount("/docs-media", StaticFiles(directory=ROOT / "docs" / "media", check_dir=False), name="docs-media")

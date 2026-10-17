@@ -2,6 +2,14 @@ display_name: Guest Experience Assistant
 icon: "🏨"
 accent: "#ef6c00"
 collection: hospitality
+ui_ar:  # Arabic labels for the web UI language toggle only (prompts/knowledge unchanged)
+  name: مساعد تجربة الضيوف
+  use_case: يحلّل تقييمات الضيوف (بيانات تجريبية لمنتجع خيالي «Azure Bay Resort» بالإنجليزية والعربية)، ويجيب عن أسئلة السياسات ويقترح خطوات لمعالجة الشكاوى للمديرين.
+  tasks:
+  - تلخيص اتجاهات التقييم وأكثر الموضوعات مدحًا وشكوى
+  - إيجاد النمط الجذري وراء شكوى (متى بدأت وكم تتكرر)
+  - الإجابة عن أسئلة السياسات واقتراح خطوات معالجة الخدمة
+  disclaimer: مبنية على تقييمات تجريبية لفندق خيالي — لعرض قدرات الوكيل، وليست آراء ضيوف حقيقيين.
 use_case: >
   Analyses guest reviews (sample data for the fictional “Azure Bay Resort”, English and Arabic), answers policy
   questions and drafts service-recovery guidance for managers.

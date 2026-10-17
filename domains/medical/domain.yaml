@@ -2,6 +2,14 @@ display_name: Clinical Information Assistant
 icon: "🩺"
 accent: "#1565c0"
 collection: medical
+ui_ar:  # Arabic labels for the web UI language toggle only (prompts/knowledge unchanged)
+  name: مساعد المعلومات السريرية
+  use_case: يجيب عن أسئلة المعلومات الصحية للأطباء والمرضى المطّلعين باستخدام موضوعات MedlinePlus وملخصات الإرشادات والمراجعات في PubMed. لأغراض تعليمية فقط.
+  tasks:
+  - شرح حالة مرضية (ما هي، الأعراض، عوامل الخطر، العلاج المعتاد)
+  - تلخيص ما تقوله الإرشادات والمراجعات عن أسلوب علاجي
+  - توضيح متى يجب طلب رعاية عاجلة كما ورد في المصادر
+  disclaimer: معلومات تعليمية من MedlinePlus وPubMed. ليست تشخيصًا ولا خطة علاج. في الطوارئ اتصل برقم الطوارئ المحلي.
 use_case: >
   Answers health-information questions for clinicians and informed patients using MedlinePlus (NLM)
   health topics and PubMed guideline / review abstracts. Educational only.

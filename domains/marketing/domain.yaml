@@ -2,6 +2,14 @@ display_name: Marketing Insights Assistant
 icon: "📣"
 accent: "#c2185b"
 collection: marketing
+ui_ar:  # Arabic labels for the web UI language toggle only (prompts/knowledge unchanged)
+  name: مساعد رؤى التسويق
+  use_case: يحلّل أداء الحملات والقنوات لعلامة تجارية (بيانات تجريبية لعلامة خيالية «Nile Glow Skincare»)، ويشرح مقاييس التسويق ويقترح إجراءات مبنية على الأدلة.
+  tasks:
+  - ترتيب القنوات حسب ROAS / CPA وشرح الأسباب
+  - تشخيص تغيّر في الأداء (مثل انخفاض CTR) من البيانات
+  - اقتراح الخطوات التالية بالأرقام، وشرح مقاييس التسويق
+  disclaimer: مبنية على بيانات تجريبية لعلامة تجارية خيالية — لعرض قدرات الوكيل، وليست نتائج سوق حقيقية.
 use_case: >
   Analyses a brand's campaign and channel performance (sample data for the fictional brand “Nile Glow
   Skincare”), explains marketing metrics and suggests evidence-based actions.

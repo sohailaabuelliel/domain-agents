@@ -26,7 +26,9 @@ pip install -r requirements.txt
 uvicorn api.server:app --port 8000                      # open http://localhost:8000
 ```
 
-Then open **Settings** in the UI, choose a provider (**Gemini** by default, or OpenAI / Azure OpenAI), **paste your own API key**, and press *Test connection*. The key lives only in your browser tab; it is never stored or committed.
+Then open **Settings** in the UI, choose a provider (**Gemini** by default, or OpenAI / Azure OpenAI) and **paste your own API key**. The **Model** list fills itself from that provider (only chat-capable models, newest first; Azure lists your deployments), so you pick a model instead of typing its name. Press *Test connection* to confirm. The key lives only in your browser tab; it is never stored or committed.
+
+The interface has an **EN / عربي** switch (bottom of the sidebar). It translates the UI only and mirrors the layout right-to-left; the documentation stays in English, and the agent answers in the language of the question unless you choose one.
 The vector indexes are pre-built and included, so the first question does not wait for indexing. Prefer a file? Copy `.env.example` to `.env`.
 
 > **Free-tier note.** Each answer uses 3–4 model calls. A free Gemini key has small daily quotas; if you hit them the agent falls back to a lighter model automatically, and degrades to keyword search if embeddings are unavailable. A key with billing enabled avoids all of that.
@@ -57,8 +59,8 @@ It appears in the UI automatically.
 ```
 domain_agent/   engine: config · llm · retrieval · guardrails · tools · agent · memory     ← code
 domains/<d>/    domain.yaml · few_shots.yaml · knowledge/ · eval.yaml                       ← per-sector configuration
-api/  web/      FastAPI + SSE server, static UI (no build step)
-eval/  tests/   evaluation harness & reports · 49 offline unit tests (no API key needed)
+api/  web/      FastAPI + SSE server, static UI (no build step) · i18n.js = EN/AR UI strings
+eval/  tests/   evaluation harness & reports · 61 offline unit tests (no API key needed)
 scripts/        data fetchers (FDA, PubMed, MedlinePlus, SEC), index builder, CLI
 docs/           ALL documentation (kept separate from code, per the brief)                 ← docs
 ```
@@ -74,7 +76,7 @@ docs/           ALL documentation (kept separate from code, per the brief)      
 
 ## Tests
 ```bash
-pytest -q                           # 49 offline tests, no key needed
+pytest -q                           # 61 offline tests, no key needed
 python eval/run_eval.py             # 50 end-to-end cases, needs a key
 ```
 

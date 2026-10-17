@@ -26,6 +26,9 @@ Adding a sixth sector = copy a folder, edit YAML, drop in markdown, run `scripts
 | **Real public data where it exists** (FDA, PubMed, MedlinePlus, SEC); **clearly labelled synthetic** data where it cannot (marketing campaigns, hotel reviews) | Scrape random sites | Real, citable sources are the point of RAG. Synthetic sets say so in the first line of every file and in the UI disclaimer; their statistics are *computed from the records*, so evaluation answers are checkable. |
 | **No-build web UI** (vanilla JS) | React/Vite | Zero tooling for the reviewer: `uvicorn` and open the page. |
 | **API key from the UI**, kept in `sessionStorage`, sent per request, never stored server-side | `.env` only | The brief wants anyone to run it with their own key. The key never reaches disk or logs. |
+| **Model list fetched from the provider** (`POST /api/models`), filtered to chat models, cached 10 min | A hard-coded model name the user must type | Model names change monthly; a typo silently fails. The dropdown shows exactly what the user's key can call; a *Custom* entry remains for unlisted deployments. |
+| **UI language switch (EN / Arabic)** with logical CSS properties, so RTL mirrors without a second stylesheet | Separate Arabic page | One code path. Sector names, tasks and disclaimers are configuration (`ui_ar:` in `domain.yaml`); documentation, sources and evaluation stay in English. |
+| **Everything vendored** (Mermaid, Marked, IBM Plex fonts, icons) under `web/` | CDN links | Works offline and behind proxies; no third-party request leaks the page. Docs render Mermaid diagrams as real charts. |
 
 ## 3. Trade-offs we accepted (and what we'd do about them)
 

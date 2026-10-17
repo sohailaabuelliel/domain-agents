@@ -109,6 +109,7 @@ class DomainConfig:
     languages: list[str] = field(default_factory=lambda: ["en", "ar"])
     accent: str = "#0d7a6f"
     icon: str = "🧪"
+    ui_ar: dict[str, Any] = field(default_factory=dict)  # Arabic labels for the UI only (name, use_case, tasks)
 
     @property
     def min_score(self) -> float:
@@ -144,6 +145,7 @@ def load_domain(domain_id: str) -> DomainConfig:
         languages=raw.get("languages", ["en", "ar"]),
         accent=raw.get("accent", "#0d7a6f"),
         icon=raw.get("icon", "🧪"),
+        ui_ar=raw.get("ui_ar", {}) or {},
     )
 
 

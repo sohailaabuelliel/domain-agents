@@ -16,3 +16,8 @@
 2. Ask any question → shorter, professional wording.
 3. "Answer in Arabic from now on." → Arabic replies, citations unchanged.
 4. Click *forget* → back to defaults.
+
+## Interface: live model list and Arabic UI
+* **Settings → Model** is filled by the provider itself (`POST /api/models`): Gemini and OpenAI list the chat models the key can call (embedding, image, audio and TTS models are filtered out; newest first); Azure lists the resource's deployments. A *Custom* option stays for anything unlisted.
+* **EN / عربي switch** translates every UI label and mirrors the layout right-to-left. Sector names, tasks and disclaimers come from each `domain.yaml` (`ui_ar:` block), so a new sector adds its Arabic text without code. Documentation stays in English.
+* **Icons** for the five sectors and the logo were generated with OpenAI `gpt-image` and are stored as small PNGs in `web/icons/`.

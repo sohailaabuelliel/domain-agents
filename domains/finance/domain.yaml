@@ -2,6 +2,14 @@ display_name: Financial Analyst Assistant
 icon: "📈"
 accent: "#5e35b1"
 collection: finance
+ui_ar:  # Arabic labels for the web UI language toggle only (prompts/knowledge unchanged)
+  name: مساعد التحليل المالي
+  use_case: يجيب عن أسئلة الشركات العامة باستخدام أرقام حقيقية من تقارير SEC 10-K (الإيرادات، الهوامش، التدفق النقدي، الرافعة المالية) ويشرح النسب. يعرض الأرقام ويقارنها، ولا يقدّم نصائح استثمارية.
+  tasks:
+  - عرض ومقارنة الأرقام المعلنة لشركة على خمس سنوات مالية
+  - شرح ومقارنة نسب الربحية والنمو والرافعة المالية
+  - شرح نسبة أو مصطلح مالي
+  disclaimer: أرقام تاريخية من تقارير SEC، والنسب المحسوبة موضّحة. ليست نصيحة استثمارية.
 use_case: >
   Answers questions about public companies using real SEC 10-K figures (revenue, margins, cash flow,
   leverage) and explains ratios. It reports and compares numbers; it never gives investment advice.

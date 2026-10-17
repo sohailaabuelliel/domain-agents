@@ -5,46 +5,35 @@ One engine, five sectors. A sector is **configuration + a knowledge folder** —
 ## System diagram
 
 ```mermaid
-flowchart LR
-    U([User]) --> UI["Web UI<br/>web/"]
-    UI -- "POST /api/ask (SSE stream)<br/>question, domain, session id,<br/>user's own API key" --> API["FastAPI<br/>api/server.py"]
-    API --> MEM["Session memory<br/>domain_agent/memory.py"]
-    API --> AG
+flowchart TB
+    U([User]) --> UI["Web UI · web/"]
+    UI -- "POST /api/ask · SSE stream<br/>question · domain · session id · user's own API key" --> API["FastAPI · api/server.py"]
+    API <--> MEM[("Session memory<br/>memory.py")]
+    CFG[["domains/#lt;sector#gt;/ — configuration, no code<br/>domain.yaml · few_shots.yaml · knowledge/*.md · eval.yaml"]]
 
-    subgraph ENGINE["domain_agent/  (the engine — identical for every sector)"]
+    subgraph ENGINE["domain_agent/ — the engine, identical for every sector"]
         direction TB
-        AG["DomainAgent.ask()<br/>agent.py"] --> G1["1 Input guardrails<br/>guardrails.py"]
-        G1 -- blocked --> REF["Refusal (0 LLM calls)"]
-        G1 -- ok --> LOOP["2 ReAct loop<br/>LLM decides which tool to call"]
-        LOOP --> T1["search_knowledge<br/>tools.py"]
-        LOOP --> T2["pubmed_search (live)<br/>tools.py"]
-        T1 --> RET["Hybrid retriever<br/>retrieval.py<br/>embeddings + BM25 + RRF"]
-        LOOP --> COV{"3 Coverage check<br/>similarity ≥ threshold?<br/>unknown names?"}
-        COV -- no --> NE["'No evidence found'"]
-        COV -- yes --> ANS["4 Structured answer<br/>JSON schema + few-shot"]
-        ANS --> VER["5 Citation + grounding check"]
-        VER -- "uncited" --> NE
-        VER --> REV["6 Safety-reviewer agent<br/>(second LLM role)"]
-        REV --> CONF["7 Confidence score<br/>from measured signals"]
+        AG["DomainAgent.ask() · agent.py"] --> G1["1 · Input guardrails"]
+        G1 -- blocked --> REF["Refusal · 0 LLM calls"]
+        G1 -- ok --> LOOP["2 · ReAct loop — LLM chooses a tool<br/>search_knowledge · pubmed_search (live)"]
+        LOOP <--> RET[("Hybrid retriever · retrieval.py<br/>embeddings + BM25 + RRF")]
+        LOOP --> COV{"3 · Coverage check<br/>similarity ≥ threshold?<br/>unknown names?"}
+        COV -- no --> NE["No evidence found"]
+        COV -- yes --> ANS["4 · Structured answer<br/>JSON schema + few-shot"]
+        ANS --> VER["5 · Citation + grounding check"]
+        VER -- uncited --> NE
+        VER -- ok --> REV["6 · Safety-reviewer agent"]
+        REV --> CONF["7 · Confidence score<br/>from measured signals"]
     end
 
-    LOOP -. "chat / structured" .-> LLM
-    ANS -.-> LLM
-    REV -.-> LLM
-    RET -. "embed" .-> LLM
-    LLM["LLM adapter  llm.py<br/>Gemini (default) · OpenAI · Azure OpenAI"]
-
-    subgraph DOM["domains/<sector>/  (configuration, no code)"]
-        Y1["domain.yaml<br/>prompt · guardrails · aliases · tools"]
-        Y2["few_shots.yaml"]
-        Y3["knowledge/*.md<br/>(front-matter: title, entity, source, url)"]
-        Y4["eval.yaml"]
-    end
-    DOM --> ENGINE
-    CONF --> API
-    NE --> API
-    REF --> API
-    API --> UI
+    API --> AG
+    CFG --> AG
+    LLM["LLM adapter · llm.py<br/>Gemini (default) · OpenAI · Azure OpenAI"]
+    API --> LLM
+    LLM -. "chat · structured output · review · embeddings" .-> ENGINE
+    CONF --> OUT(["Answer + sources + confidence"])
+    NE --> OUT
+    REF --> OUT
 ```
 
 ## The seven steps of one question
@@ -64,12 +53,12 @@ Steps 1, 3, 5, 7 are plain Python, so they are fast, free, deterministic and uni
 ## Data flow of the knowledge base
 
 ```mermaid
-flowchart LR
+flowchart TB
     S["Public sources<br/>FDA · PubMed · MedlinePlus · SEC EDGAR<br/>(or labelled synthetic samples)"] --> F["scripts/fetch_*.py<br/>scripts/generate_sample_data.py"]
-    F --> MD["domains/&lt;d&gt;/knowledge/*.md"]
+    F --> MD["domains/#lt;sector#gt;/knowledge/*.md"]
     MD --> CH["load_chunks()<br/>split on ## headings,<br/>keep metadata"]
     CH --> EM["embed_content<br/>(RETRIEVAL_DOCUMENT)"]
-    EM --> IDX[("data/index/&lt;d&gt;.npz<br/>vectors + fingerprint")]
+    EM --> IDX[("data/index/#lt;sector#gt;.npz<br/>vectors + fingerprint")]
     CH --> BM[("BM25 in memory")]
 ```
 

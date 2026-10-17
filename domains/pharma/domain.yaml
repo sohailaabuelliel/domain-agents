@@ -2,6 +2,14 @@ display_name: Pharma Safety Assistant
 icon: "💊"
 accent: "#0d7a6f"
 collection: pharma
+ui_ar:  # Arabic labels for the web UI language toggle only (prompts/knowledge unchanged)
+  name: مساعد سلامة الأدوية
+  use_case: يساعد الصيادلة والأطباء في معلومات نشرات الأدوية، والتداخلات الدوائية، والأدلة المنشورة، ويجيب بصيغة ثابتة مع ذكر المصادر.
+  tasks:
+  - تلخيص نشرة دواء (الاستخدامات، موانع الاستعمال، التحذيرات)
+  - فحص التداخلات بين دوائين أو أكثر وتقدير خطورتها
+  - تقديم سياق مدعوم بالأدلة من ملخصات PubMed
+  disclaimer: معلومات تعليمية من مصادر عامة (نشرات FDA، وPubMed). ليست نصيحة طبية. تأكّد دائمًا مع الطبيب المعالج أو النشرة الرسمية الحالية.
 use_case: >
   Helps pharmacists and clinicians look up drug-label information, drug–drug interactions and
   published evidence, and answers in a fixed, cited format.

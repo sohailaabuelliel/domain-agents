@@ -38,7 +38,7 @@ Settings → switch provider to OpenAI or Azure, paste a key → same agent, sam
 Open **Checklist & spec** (requirement → where it is implemented) and the evaluation report: retrieval accuracy, answer accuracy, hallucination rate, refusal accuracy per sector.
 
 ## 9. Close (30 s)
-"Everything is in the repo: code in `domain_agent/`, configuration in `domains/`, documentation separately in `docs/`, 49 offline tests, and a Dockerfile."
+"Everything is in the repo: code in `domain_agent/`, configuration in `domains/`, documentation separately in `docs/`, 61 offline tests, and a Dockerfile."
 
 ## If something goes wrong
 | Symptom | Cause | Fix |

@@ -263,3 +263,47 @@ def make_llm(cfg: LLMConfig | None = None) -> LLM:
     if cfg.provider in ("openai", "azure"):
         return OpenAILLM(cfg)
     raise ValueError(f"Unknown provider '{cfg.provider}' (use gemini | openai | azure)")
+
+
+# ---------------------------------------------------------------- model discovery (for the settings UI)
+_NOT_CHAT = re.compile(r"(embed|tts|audio|realtime|transcri|image|vision-preview|dall-e|whisper|moderation|search|robotics|computer-use|lyria|veo|imagen|aqa|deep-research|antigravity|nano-banana|babbage|davinci|codex|instruct)", re.I)
+
+
+def filter_chat_models(provider: str, ids: list[str]) -> list[str]:
+    """Keep only models that can answer chat / tool-calling requests; newest-looking first."""
+    out = []
+    for raw in ids:
+        mid = raw.split("/", 1)[1] if raw.startswith("models/") else raw
+        if _NOT_CHAT.search(mid):
+            continue
+        if provider == "openai" and not re.match(r"^(gpt-|o\d|chatgpt-)", mid):
+            continue
+        if provider == "gemini" and not re.match(r"^(gemini|gemma)-", mid):
+            continue
+        out.append(mid)
+    def rank(m: str):
+        v = re.search(r"(?:^o|-)(\d{1,2}(?:\.\d+)?)(?![\d])", m)  # 1-2 digit version, never a date
+        ver = float(v.group(1)) if v else -1.0          # aliases like *-latest go last
+        return (not m.startswith(("gemini", "gpt")), -ver, bool(re.search(r"\d{4}-\d{2}", m)), "preview" in m or "lite" in m, len(m), m)
+    return sorted(set(out), key=rank)
+
+
+def list_models(cfg: LLMConfig) -> list[str]:
+    """Ask the provider which chat models this key can use (Azure: the resource's deployments)."""
+    cfg = cfg.resolved()
+    if cfg.provider == "gemini":
+        from google import genai
+        client = genai.Client(api_key=cfg.api_key, http_options=genai.types.HttpOptions(timeout=20_000))
+        ids = [m.name for m in client.models.list() if "generateContent" in (m.supported_actions or [])]
+        return filter_chat_models("gemini", ids)
+    if cfg.provider == "openai":
+        import openai
+        ids = [m.id for m in openai.OpenAI(api_key=cfg.api_key, base_url=cfg.base_url, timeout=20).models.list().data]
+        return filter_chat_models("openai", ids)
+    if cfg.provider == "azure":
+        import httpx
+        r = httpx.get(f"{cfg.azure_endpoint.rstrip('/')}/openai/deployments", params={"api-version": "2022-12-01"},
+                      headers={"api-key": cfg.api_key}, timeout=20)
+        r.raise_for_status()
+        return sorted(d["id"] for d in r.json().get("data", []))
+    raise ValueError(f"Unknown provider '{cfg.provider}'")
