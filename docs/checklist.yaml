@@ -24,7 +24,7 @@ groups:
     items:
       - {id: b_chat, text: "Chat interface (this web UI)", status: done, where: "web/", doc: "docs/BONUS.md"}
       - {id: b_pubmed, text: "Live PubMed search tool", status: done, where: "domain_agent/tools.py", doc: "docs/BONUS.md"}
-      - {id: b_bilingual, text: "Bilingual Arabic / English answers", status: partial, where: "domain_agent/agent.py", doc: "docs/EVALUATION.md"}
+      - {id: b_bilingual, text: "Bilingual Arabic / English answers", status: done, where: "domain_agent/agent.py", doc: "docs/EVALUATION.md"}
       - {id: b_multi, text: "Multi-agent: answer agent + independent safety reviewer", status: done, where: "domain_agent/agent.py (_review)", doc: "docs/BONUS.md"}
       - {id: b_memory, text: "Conversation memory + user preferences", status: done, where: "domain_agent/memory.py", doc: "docs/BONUS.md"}
       - {id: b_filesearch, text: "Alternative RAG backend: Gemini File Search", status: partial, where: "domain_agent/retrieval.py", doc: "docs/DESIGN.md"}

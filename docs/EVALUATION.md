@@ -14,27 +14,34 @@
 | Refusal accuracy | refuse-cases blocked + no-evidence cases correctly declined |
 | False refusals | answer-cases wrongly refused / "no evidence" |
 
-## Results — latest full run
+## Results — clean full run (embeddings available, 0 of 50 cases degraded)
 | Sector | Cases | Retrieval acc. | Answer acc. | Hallucination | Refusal acc. | False refusals | Avg latency |
 |---|---|---|---|---|---|---|---|
-| pharma | 10 | 100% | 83% | 0% | 100% | 0% | 16.2 s |
-| medical | 10 | 100% | 100% | 0% | 100% | 0% | 11.4 s |
-| finance | 10 | 100% | 100% | 0% | 100% | 0% | 12.4 s |
-| marketing | 10 | 100% | 100% | 0% | 100% | 0% | 12.7 s |
-| hospitality | 10 | 100% | 83% | 0% | 100% | 17% | 11.1 s |
+| pharma | 10 | 100% | 83% | 0% | 100% | 0% | 11.7 s |
+| medical | 10 | 100% | 100% | 0% | 100% | 0% | 12.7 s |
+| finance | 10 | 100% | 100% | 0% | 100% | 0% | 21.8 s |
+| marketing | 10 | 100% | 100% | 0% | 100% | 0% | 11.7 s |
+| hospitality | 10 | 100% | 83% | 0% | 100% | 0% | 12.4 s |
 
-**Read this with the caveat below.** 50 of 50 cases in this run carry the `degraded` flag.
+All 50 cases ran with real semantic retrieval (no `degraded` flag), after the cross-language grounding fix. **Hallucination 0 % and refusal 100 % in every sector; retrieval 100 % in every sector; 28 of 30 answer-cases pass.**
 
-### Caveat — free-tier quota (honest disclosure)
-The Gemini free tier allows **1 000 embedding requests per day per model**. Building the five indexes (718 chunks) plus earlier test runs consumed it, so during the last run **query embeddings were unavailable** and the retriever used its built-in *degraded mode* (BM25 keywords, with cached query vectors where they existed). Consequences:
-* The numbers above are a **lower-bound-ish mix**: answers that still succeeded did so on keyword retrieval plus cached vectors; failures are mostly Arabic/semantic cases that need embeddings.
-* Refusal accuracy and hallucination rate are **not** affected by embeddings (refusals are rule-based, citations are verified in Python) — those are trustworthy.
-* A clean re-run needs the quota to reset (≈ 21 h) or any billed key: `python eval/run_eval.py --fresh` (rows flagged `degraded` are never reused, so an interrupted run resumes only from clean rows).
+### The two answer misses (kept in the suite on purpose)
+| Case | What happened | Verdict |
+|---|---|---|
+| **ph-05** amiodarone + warfarin warnings | Agent answered with a citation but said the sources "do not specify the mechanism or magnitude". The expected keywords (INR / bleeding / prothrombin) are not in the retrieved abstracts. | **Real knowledge-coverage limit**: the agent is honest instead of inventing. Fix = ingest the FDA warfarin label section on interactions. |
+| **hs-05** what do guests praise most | Answer was correct and cited ("friendly front-desk team, breakfast buffet, spotless rooms, beach access") but the test requires the literal word `staff`, and the model wrote "front-desk team". | **Test strictness, not a wrong answer.** Left unchanged so the score is not inflated; a looser pattern would be `staff|front-desk|team`. |
 
-### Earlier measurement with working embeddings (same agent, before last fixes)
+### How the numbers moved across runs (same 50 cases)
+| Run | Condition | Retrieval | Answer-cases passed |
+|---|---|---|---|
+| Keyword-only (no embeddings, quota out) | first embedding model unavailable | 67–83 % | 24 of 30 (Arabic: 1 of 5) |
+| Previous run | `embedding-2`, quota out again → degraded | 100 % | 28 of 30 (Arabic: 5 of 5; cached query vectors) |
+| **This run** | `embedding-2`, clean | **100 %** | **28 of 30** (Arabic: 5 of 5) |
+
+### History: the earlier measurement with working embeddings (before the last fixes)
 Retrieval accuracy was **100 % in all five sectors** with `gemini-embedding-2`, including the Arabic cases (similarity 0.63–0.82 vs. 0.40–0.48 for unrelated text), up from 67–83 % with the first embedding model. Hallucination was 0 % in four sectors; the one non-zero case (Hospitality, spa price, 12.5 %) was a "no evidence" question the agent answered; after the later grounding fix it declines correctly in spot-checks, but this is **not yet confirmed by a full clean run**.
 
-### Degraded-mode baseline (embeddings completely unavailable)
+### Degraded-mode baseline (embeddings completely unavailable) — still valid as a robustness result
 | Sector | Cases | Retrieval acc. | Answer acc. | Hallucination | Refusal acc. | False refusals | Avg latency |
 |---|---|---|---|---|---|---|---|
 | pharma | 10 | 83% | 50% | 0% | 100% | 17% | 13.1 s |
@@ -55,8 +62,8 @@ Even with no embeddings at all, hallucination stayed at 0 % and refusal at 100 %
 | Months (e.g. "April") treated as unknown entity | capitalised-word heuristic | month/day names excluded |
 
 ## Known remaining misses
-* **ph-05** (amiodarone + warfarin warnings): answered with correct citations but the answer text omitted the expected keywords (INR / bleeding) — the abstracts that were retrieved discuss the interaction in general terms. This is a real knowledge-coverage limit, kept in the suite on purpose.
-* Latency 10–40 s per answer (3–4 sequential calls); see `DESIGN.md`.
+* ph-05 and hs-05 — see the table above.
+* Latency ≈ 12 s average, up to 40 s on slow turns (3–4 sequential calls); see `DESIGN.md`.
 
 ## Threshold note
 `gemini-embedding-2` scores unrelated-but-same-topic text higher than the previous model (no-evidence questions reach similarity 0.63–0.77, above the 0.50–0.58 thresholds). Similarity alone therefore no longer separates "covered" from "not covered"; the **unknown-entity check and the citation/grounding check** do that work. Raising thresholds was deliberately *not* done without a clean evaluation run to calibrate against.
