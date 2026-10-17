@@ -12,25 +12,25 @@ groups:
   - title: Domain adaptation (same engine, 5 sectors, config only)
     items:
       - {id: d_pharma, text: "Pharma / drug safety (FDA labels + PubMed)", status: done, where: "domains/pharma/", doc: "docs/domains/pharma.md"}
-      - {id: d_medical, text: "Medical / clinical guidelines", status: todo, where: "domains/medical/", doc: ""}
-      - {id: d_finance, text: "Finance / company reports", status: todo, where: "domains/finance/", doc: ""}
-      - {id: d_marketing, text: "Marketing / campaign insights", status: todo, where: "domains/marketing/", doc: ""}
-      - {id: d_hospitality, text: "Hospitality / guest reviews", status: todo, where: "domains/hospitality/", doc: ""}
+      - {id: d_medical, text: "Medical / clinical guidelines", status: done, where: "domains/medical/", doc: "docs/DESIGN.md"}
+      - {id: d_finance, text: "Finance / company reports", status: done, where: "domains/finance/", doc: "docs/DESIGN.md"}
+      - {id: d_marketing, text: "Marketing / campaign insights", status: done, where: "domains/marketing/", doc: "docs/DESIGN.md"}
+      - {id: d_hospitality, text: "Hospitality / guest reviews", status: done, where: "domains/hospitality/", doc: "docs/DESIGN.md"}
   - title: Evaluation
     items:
-      - {id: eval_sets, text: "Golden question sets per domain (answerable, unanswerable, dangerous)", status: todo, where: "domains/*/eval.yaml", doc: "docs/EVALUATION.md"}
-      - {id: eval_run, text: "Runner reporting retrieval accuracy, answer accuracy, hallucination rate, refusal rate", status: todo, where: "eval/run_eval.py", doc: "docs/EVALUATION.md"}
+      - {id: eval_sets, text: "Golden question sets per domain (answerable, unanswerable, dangerous)", status: done, where: "domains/<sector>/eval.yaml (50 cases)", doc: "docs/EVALUATION.md"}
+      - {id: eval_run, text: "Runner reporting retrieval accuracy, answer accuracy, hallucination rate, refusal rate", status: done, where: "eval/run_eval.py", doc: "docs/EVALUATION.md"}
   - title: Bonus features
     items:
-      - {id: b_chat, text: "Chat interface (this web UI)", status: partial, where: "web/", doc: "docs/BONUS.md"}
+      - {id: b_chat, text: "Chat interface (this web UI)", status: done, where: "web/", doc: "docs/BONUS.md"}
       - {id: b_pubmed, text: "Live PubMed search tool", status: done, where: "domain_agent/tools.py", doc: "docs/BONUS.md"}
-      - {id: b_bilingual, text: "Bilingual Arabic / English answers", status: partial, where: "domain_agent/agent.py", doc: "docs/BONUS.md"}
+      - {id: b_bilingual, text: "Bilingual Arabic / English answers", status: partial, where: "domain_agent/agent.py", doc: "docs/EVALUATION.md"}
       - {id: b_multi, text: "Multi-agent: answer agent + independent safety reviewer", status: done, where: "domain_agent/agent.py (_review)", doc: "docs/BONUS.md"}
-      - {id: b_memory, text: "Conversation memory + user preferences", status: todo, where: "domain_agent/memory.py", doc: "docs/BONUS.md"}
+      - {id: b_memory, text: "Conversation memory + user preferences", status: done, where: "domain_agent/memory.py", doc: "docs/BONUS.md"}
       - {id: b_filesearch, text: "Alternative RAG backend: Gemini File Search", status: partial, where: "domain_agent/retrieval.py", doc: "docs/DESIGN.md"}
   - title: Deliverables
     items:
       - {id: repo, text: "Public GitHub repository, no secrets", status: todo, where: "repo root", doc: "README.md"}
-      - {id: arch, text: "Architecture diagram", status: todo, where: "docs/ARCHITECTURE.md", doc: ""}
-      - {id: doc, text: "Short document: decisions, trade-offs, scaling plan", status: todo, where: "docs/DESIGN.md", doc: ""}
-      - {id: video, text: "Demo video script", status: todo, where: "docs/DEMO_SCRIPT.md", doc: ""}
+      - {id: arch, text: "Architecture diagram", status: done, where: "docs/ARCHITECTURE.md", doc: "docs/ARCHITECTURE.md"}
+      - {id: doc, text: "Short document: decisions, trade-offs, scaling plan", status: done, where: "docs/DESIGN.md", doc: "docs/DESIGN.md"}
+      - {id: video, text: "Demo video script", status: done, where: "docs/DEMO.md", doc: "docs/DEMO.md"}

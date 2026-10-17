@@ -220,6 +220,7 @@ class HybridRetriever(Retriever):
         except Exception:  # noqa: BLE001
             cache = {}
         if key in cache:
+            self.degraded = ""
             return np.array(cache[key], dtype=np.float32)
         try:
             v = self.llm.embed([query], kind="query")[0]
