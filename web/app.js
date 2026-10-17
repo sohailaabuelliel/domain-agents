@@ -111,6 +111,17 @@ const S = {
   close() { $("#modal").classList.add("hidden"); },
 };
 $("#openSettings").onclick = S.open;
+$("#stopServer").onclick = async () => {
+  if (!confirm(t("stop.confirm"))) return;
+  try {
+    const r = await fetch("/api/shutdown", { method: "POST" });
+    if (!r.ok) { alert((await r.json().catch(() => ({}))).detail || r.statusText); return; }
+  } catch (e) { /* the server may close the connection while stopping */ }
+  const d = document.createElement("div");
+  d.className = "stopped";
+  d.innerHTML = `<div><h2>${t("stop.done")}</h2><p>${t("stop.close")}</p><p>${t("stop.again")}</p></div>`;
+  document.body.appendChild(d);
+};
 $("#closeSettings").onclick = $("#xSettings").onclick = S.close;
 $("#modal").addEventListener("mousedown", e => { if (e.target.id === "modal") S.close(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape") { S.close(); closeSide(); } });

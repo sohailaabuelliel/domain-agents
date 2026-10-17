@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from domain_agent.config import list_domains, load_domain  # noqa: E402
+from domain_agent.config import ROOT, list_domains, load_domain  # noqa: E402
 from domain_agent.guardrails import Verification, check_input, compute_confidence, verify_answer  # noqa: E402
 from domain_agent.memory import Memory, MemoryStore  # noqa: E402
 from domain_agent.retrieval import BM25, Chunk, Hit, find_entities, load_chunks, tokenize  # noqa: E402
@@ -223,3 +223,20 @@ def test_ui_strings_exist_in_both_languages():
     assert keys(en) == keys(ar), keys(en) ^ keys(ar)
     used = set(_re.findall(r'data-i18n(?:-ph|-title)?="([\w.]+)"', (Path(__file__).resolve().parents[1] / "web" / "index.html").read_text(encoding="utf-8")))
     assert used <= keys(en), used - keys(en)
+
+
+def test_shutdown_is_refused_from_another_computer():
+    from fastapi.testclient import TestClient
+    import api.server as srv
+    r = TestClient(srv.app).post("/api/shutdown")   # TestClient's host is "testclient", not localhost
+    assert r.status_code == 403
+
+
+def test_start_and_stop_scripts_need_only_the_standard_library():
+    import ast
+    import sys as _sys
+    for name in ("start.py", "stop.py"):
+        tree = ast.parse((ROOT / name).read_text(encoding="utf-8"))
+        mods = {a.name.split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names}
+        mods |= {n.module.split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.ImportFrom) and n.module}
+        assert mods <= set(_sys.stdlib_module_names) | {"__future__"}, (name, mods - set(_sys.stdlib_module_names))

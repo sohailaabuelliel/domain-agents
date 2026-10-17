@@ -7,13 +7,15 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 import queue
+import signal
 import threading
 from pathlib import Path
 from typing import Any, Optional
 
 import yaml
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -174,6 +176,19 @@ def get_memory(session_id: str):
 def clear_memory(session_id: str):
     MEMORY.clear(session_id)
     return {"preferences": []}
+
+
+@app.post("/api/shutdown")
+def shutdown(request: Request):
+    """Stop button in the UI. Only accepted from the same computer (never over the network)."""
+    host = request.client.host if request.client else ""
+    if host not in ("127.0.0.1", "::1", "localhost"):
+        raise HTTPException(403, "The server can only be stopped from the computer it runs on.")
+    threading.Timer(0.4, signal.raise_signal, args=(signal.SIGINT,)).start()  # same as Ctrl+C
+    guard = threading.Timer(8.0, os._exit, args=(0,))  # safety net if the graceful stop hangs
+    guard.daemon = True                                  # never keeps the process alive by itself
+    guard.start()
+    return {"stopping": True}
 
 
 @app.get("/")

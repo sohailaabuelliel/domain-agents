@@ -8,3 +8,4 @@ data/index/*.queries.json
 data/memory.db
 eval/reports/*.tmp
 node_modules/
+.run/

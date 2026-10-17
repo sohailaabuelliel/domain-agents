@@ -3,7 +3,7 @@
 Goal: show that **one engine** serves several sectors, stays grounded, refuses what it should, and is measurable.
 
 ## Before you start
-1. `uvicorn api.server:app --port 8000` → open http://localhost:8000
+1. `python start.py` (Windows: double-click `start.bat`) → the browser opens http://localhost:8000. Stop later with Ctrl+C, `python stop.py`, or **Stop server** in the sidebar.
 2. **Settings** → provider *Gemini* → paste your key → *Test connection* (green tick).
 
 ## 1. The idea in one sentence (30 s)
@@ -38,7 +38,7 @@ Settings → switch provider to OpenAI or Azure, paste a key → same agent, sam
 Open **Checklist & spec** (requirement → where it is implemented) and the evaluation report: retrieval accuracy, answer accuracy, hallucination rate, refusal accuracy per sector.
 
 ## 9. Close (30 s)
-"Everything is in the repo: code in `domain_agent/`, configuration in `domains/`, documentation separately in `docs/`, 61 offline tests, and a Dockerfile."
+"Everything is in the repo: code in `domain_agent/`, configuration in `domains/`, documentation separately in `docs/`, 63 offline tests, one-command start/stop scripts, and a Dockerfile."
 
 ## If something goes wrong
 | Symptom | Cause | Fix |

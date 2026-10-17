@@ -31,6 +31,9 @@ window.I18N = {
     "set.found": "{n} chat models available for this key", "set.failed": "Couldn't list models: {e}", "set.needKey": "Add a key (or endpoint) to load the model list.",
     "set.test": "Test connection", "set.testing": "Testing…", "set.done": "Done",
     "key.yours": "using your key", "key.server": "using the server's key (.env)",
+    "stop.btn": "Stop server", "stop.confirm": "Stop the server? The app will close until you start it again.",
+    "stop.done": "The server is stopped", "stop.close": "You can close this tab.",
+    "stop.again": "To start again run <code>python start.py</code> (or start.bat / start.sh).",
   },
   ar: {
     "brand.tag": "محرك واحد · خمسة قطاعات",
@@ -63,5 +66,8 @@ window.I18N = {
     "set.found": "{n} نموذج محادثة متاح لهذا المفتاح", "set.failed": "تعذّر جلب النماذج: {e}", "set.needKey": "أضف مفتاحًا (أو رابطًا) لتحميل قائمة النماذج.",
     "set.test": "اختبار الاتصال", "set.testing": "جارٍ الاختبار…", "set.done": "تم",
     "key.yours": "يستخدم مفتاحك", "key.server": "يستخدم مفتاح الخادم (.env)",
+    "stop.btn": "إيقاف الخادم", "stop.confirm": "إيقاف الخادم؟ سيتوقف التطبيق حتى تشغّله مرة أخرى.",
+    "stop.done": "تم إيقاف الخادم", "stop.close": "يمكنك إغلاق هذا التبويب.",
+    "stop.again": "للتشغيل مرة أخرى: <code>python start.py</code> (أو start.bat / start.sh).",
   },
 };

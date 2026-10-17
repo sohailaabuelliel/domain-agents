@@ -18,13 +18,31 @@ It answers **only from retrieved sources**, cites them, says **"no evidence foun
 
 **Bonus items included:** multi-agent safety reviewer · conversation memory · live PubMed tool · chat UI with streaming trace · bilingual Arabic/English · swappable LLM provider · evaluation harness. See [docs/BONUS.md](docs/BONUS.md).
 
-## Run it (3 commands)
+## Run it — one command, any system
+
+You only need **Python 3.11+** ([download](https://www.python.org/downloads/)). The first start creates `.venv` and installs everything by itself (about a minute); later starts take ~2 seconds.
+
+| | Windows | macOS / Linux |
+|---|---|---|
+| **Start** | double-click **`start.bat`** — or in a terminal: `py start.py` | `./start.sh` — or `python3 start.py` |
+| **Stop** | press **Ctrl+C** in that window | press **Ctrl+C** in that terminal |
+| **Stop (lost the window?)** | double-click **`stop.bat`** — or `py stop.py` | `./stop.sh` — or `python3 stop.py` |
+
+Start opens **http://localhost:8000** in your browser. You can also stop from the app itself: **Stop server** at the bottom of the sidebar.
+
+* Port 8000 busy? It picks the next free one and prints it (or choose one: `python start.py --port 8080`).
+* Started twice? The second start just opens the browser on the running app.
+* Closing the terminal window also stops the server; `stop` is only needed if it is still running.
+* Options: `--no-browser`, `--port N`, `--host 0.0.0.0` (share on your network).
+
+<details><summary>Manual way (if you prefer)</summary>
 
 ```bash
-python -m venv .venv && source .venv/bin/activate      # Python 3.11+
+python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-uvicorn api.server:app --port 8000                      # open http://localhost:8000
+uvicorn api.server:app --port 8000                      # open http://localhost:8000 · stop with Ctrl+C
 ```
+</details>
 
 Then open **Settings** in the UI, choose a provider (**Gemini** by default, or OpenAI / Azure OpenAI) and **paste your own API key**. The **Model** list fills itself from that provider (only chat-capable models, newest first; Azure lists your deployments), so you pick a model instead of typing its name. Press *Test connection* to confirm. The key lives only in your browser tab; it is never stored or committed.
 
@@ -33,7 +51,7 @@ The vector indexes are pre-built and included, so the first question does not wa
 
 > **Free-tier note.** Each answer uses 3–4 model calls. A free Gemini key has small daily quotas; if you hit them the agent falls back to a lighter model automatically, and degrades to keyword search if embeddings are unavailable. A key with billing enabled avoids all of that.
 
-Docker: `docker build -t domain-agents . && docker run -p 8000:8000 domain-agents`
+Docker: `docker build -t domain-agents . && docker run -p 8000:8000 domain-agents` (stop: Ctrl+C or `docker stop`).
 
 ## Try these
 | Sector | Ask | Expect |
@@ -60,8 +78,9 @@ It appears in the UI automatically.
 domain_agent/   engine: config · llm · retrieval · guardrails · tools · agent · memory     ← code
 domains/<d>/    domain.yaml · few_shots.yaml · knowledge/ · eval.yaml                       ← per-sector configuration
 api/  web/      FastAPI + SSE server, static UI (no build step) · i18n.js = EN/AR UI strings
-eval/  tests/   evaluation harness & reports · 61 offline unit tests (no API key needed)
+eval/  tests/   evaluation harness & reports · 63 offline unit tests (no API key needed)
 scripts/        data fetchers (FDA, PubMed, MedlinePlus, SEC), index builder, CLI
+start.py stop.py  one-command start / stop (+ start.bat/.sh, stop.bat/.sh wrappers)
 docs/           ALL documentation (kept separate from code, per the brief)                 ← docs
 ```
 
@@ -76,7 +95,7 @@ docs/           ALL documentation (kept separate from code, per the brief)      
 
 ## Tests
 ```bash
-pytest -q                           # 61 offline tests, no key needed
+pytest -q                           # 63 offline tests, no key needed
 python eval/run_eval.py             # 50 end-to-end cases, needs a key
 ```
 
