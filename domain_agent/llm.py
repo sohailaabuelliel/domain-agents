@@ -55,6 +55,9 @@ class LLMError(RuntimeError):
     pass
 
 
+_COOLDOWN: dict[str, float] = {}   # model -> epoch seconds until which it is skipped (rate-limit circuit breaker)
+
+
 def _retry(fn: Callable[[], Any], attempts: int = 4, base: float = 2.0) -> Any:
     """Retry transient errors (429 / 5xx / timeouts) with exponential backoff."""
     last: Exception | None = None
@@ -97,7 +100,7 @@ class GeminiLLM(LLM):
     def __init__(self, cfg: LLMConfig):
         from google import genai
         self._genai = genai
-        self.client = genai.Client(api_key=cfg.api_key)
+        self.client = genai.Client(api_key=cfg.api_key, http_options=genai.types.HttpOptions(timeout=90_000))  # ms: a hung connection must fail, not wait forever
         self.model = cfg.model or "gemini-3.5-flash"
         self.default_temp = cfg.temperature
 
@@ -154,17 +157,27 @@ class GeminiLLM(LLM):
                          prompt_tokens=(u.prompt_token_count or 0) if u else 0, output_tokens=(u.candidates_token_count or 0) if u else 0)
 
     def chat(self, system, messages, tools=None, schema=None, temperature=0.0):
-        models = [self.model] + [m for m in GEMINI_FALLBACK_MODELS if m != self.model]
+        """Try the primary model, then the fallbacks. A model that just returned 429 is put on a cool-down
+        (1 h for a daily quota, 65 s for a per-minute one) and skipped, so a rate-limited primary costs
+        one fast failure instead of a 60-second sleep on every turn."""
+        chain = [self.model] + [m for m in GEMINI_FALLBACK_MODELS if m != self.model]
+        now = time.time()
+        ready = [m for m in chain if _COOLDOWN.get(m, 0) <= now]
+        models = ready or chain[-1:]                      # everything cooling down: still try the last one
         last: Exception | None = None
-        for model in models:
+        for n, model in enumerate(models):
+            more = n < len(models) - 1
             try:
-                r = _retry(lambda: self._call(model, system, messages, tools, schema, temperature), attempts=3)
-                if model != models[0]:
+                r = _retry(lambda: self._call(model, system, messages, tools, schema, temperature), attempts=1 if more else 3)
+                if model != chain[0]:
                     print(f"[llm] primary model unavailable, answered with fallback {model}", flush=True)
                 return r
             except Exception as e:  # noqa: BLE001
                 last = e
-                if not any(t in str(e) for t in ("429", "503", "UNAVAILABLE", "RESOURCE_EXHAUSTED")):
+                msg = str(e)
+                if "429" in msg or "RESOURCE_EXHAUSTED" in msg:
+                    _COOLDOWN[model] = time.time() + (3600 if "PerDay" in msg else 65)
+                if not any(t in msg for t in ("429", "503", "UNAVAILABLE", "RESOURCE_EXHAUSTED", "timed out", "Timeout")):
                     break
         raise LLMError(f"Gemini request failed: {str(last)[:300]}")
 

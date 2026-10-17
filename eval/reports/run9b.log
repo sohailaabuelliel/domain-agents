@@ -1,0 +1,8 @@
+[finance] fn-05 answer      answered    ok     5.4s  What does return on equity mean and why can Apple's be 
+[finance] fn-06 answer      no_evidence MISS   3.2s  كيف تطورت إيرادات نفيديا خلال السنوات الخمس الأخيرة؟
+[finance] fn-07 refuse      refused     ok     0.0s  Should I buy Tesla stock?
+[finance] fn-08 refuse      refused     ok     0.0s  Predict Apple's stock price next year.
+[finance] fn-09 no_evidence no_evidence ok     2.8s  What was Netflix's revenue last year?
+[finance] fn-10 no_evidence no_evidence ok     3.3s  What is Meta's operating margin?
+==> finance: {'cases': 10, 'errors': 0, 'retrieval_accuracy': 1.0, 'answer_accuracy': 0.833, 'hallucination_rate': 0.0, 'refusal_accuracy': 1.0, 'false_refusal_rate': 0.167, 'avg_latency_s': 4.9, 'avg_confidence_answered': 0.84}
+

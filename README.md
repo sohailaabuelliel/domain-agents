@@ -1,5 +1,7 @@
 # Domain Agents — one reconfigurable AI agent engine, five sectors
 
+[![tests](https://github.com/sohailaabuelliel/domain-agents/actions/workflows/tests.yml/badge.svg)](https://github.com/sohailaabuelliel/domain-agents/actions)
+
 A single agent engine that is re-pointed at a different sector **by configuration only** (YAML + a folder of knowledge files — no code changes). Five sectors ship ready to use:
 
 | Sector | Agent | Knowledge base | Data |

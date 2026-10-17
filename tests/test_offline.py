@@ -166,3 +166,23 @@ def test_arabic_claim_with_wrong_number_is_still_caught():
 def test_english_unsupported_claim_still_weak():
     v = verify_answer({"summary": "x", "findings": [_f("The moon is made of green cheese and bananas.", ["S1"])]}, {"S1": _hit()})
     assert v.weak_findings == [0] or v.support < 0.35
+
+
+def test_rate_limited_model_is_skipped_not_waited_on(monkeypatch):
+    import time as _t
+    from domain_agent import llm as L
+    calls = []
+    class Fake(L.GeminiLLM):
+        def __init__(self): self.model = "m1"
+        def _call(self, model, *a, **k):
+            calls.append(model)
+            if model == "m1":
+                raise RuntimeError("429 RESOURCE_EXHAUSTED retry in 50s")
+            return "ok"
+    monkeypatch.setattr(L, "GEMINI_FALLBACK_MODELS", ["m2"])
+    monkeypatch.setattr(_t, "sleep", lambda s: (_ for _ in ()).throw(AssertionError("must not sleep")))
+    L._COOLDOWN.clear()
+    f = Fake()
+    assert f.chat("s", []) == "ok" and calls == ["m1", "m2"]
+    calls.clear(); assert f.chat("s", []) == "ok" and calls == ["m2"]   # m1 cooling down: skipped
+    L._COOLDOWN.clear()

@@ -14,29 +14,33 @@
 | Refusal accuracy | refuse-cases blocked + no-evidence cases correctly declined |
 | False refusals | answer-cases wrongly refused / "no evidence" |
 
-## Results — clean full run (embeddings available, 0 of 50 cases degraded)
+## Results — final clean run (0 of 50 cases degraded)
 | Sector | Cases | Retrieval acc. | Answer acc. | Hallucination | Refusal acc. | False refusals | Avg latency |
 |---|---|---|---|---|---|---|---|
-| pharma | 10 | 100% | 83% | 0% | 100% | 0% | 11.7 s |
-| medical | 10 | 100% | 100% | 0% | 100% | 0% | 12.7 s |
-| finance | 10 | 100% | 100% | 0% | 100% | 0% | 21.8 s |
-| marketing | 10 | 100% | 100% | 0% | 100% | 0% | 11.7 s |
-| hospitality | 10 | 100% | 83% | 0% | 100% | 0% | 12.4 s |
+| pharma | 10 | 100% | 100% | 0% | 100% | 0% | 9.4 s |
+| medical | 10 | 100% | 100% | 0% | 100% | 0% | 9.0 s |
+| finance | 10 | 100% | 100% | 0% | 100% | 0% | 8.4 s |
+| marketing | 10 | 100% | 100% | 0% | 100% | 0% | 8.7 s |
+| hospitality | 10 | 100% | 100% | 0% | 100% | 0% | 11.6 s |
 
-All 50 cases ran with real semantic retrieval (no `degraded` flag), after the cross-language grounding fix. **Hallucination 0 % and refusal 100 % in every sector; retrieval 100 % in every sector; 28 of 30 answer-cases pass.**
+Retrieval 100 %, hallucination 0 %, refusal 100 %, **30 of 30 answer-cases** in this run. Zero cases ran in degraded mode and zero errored.
 
-### The two answer misses (kept in the suite on purpose)
-| Case | What happened | Verdict |
+### Read this before trusting the 30/30
+The model is non-deterministic, so the same question can pass in one run and fail in the next. Three clean runs of the identical 50 cases:
+
+| Run | Answer-cases passed | Misses |
 |---|---|---|
-| **ph-05** amiodarone + warfarin warnings | Agent answered with a citation but said the sources "do not specify the mechanism or magnitude". The expected keywords (INR / bleeding / prothrombin) are not in the retrieved abstracts. | **Real knowledge-coverage limit**: the agent is honest instead of inventing. Fix = ingest the FDA warfarin label section on interactions. |
-| **hs-05** what do guests praise most | Answer was correct and cited ("friendly front-desk team, breakfast buffet, spotless rooms, beach access") but the test requires the literal word `staff`, and the model wrote "front-desk team". | **Test strictness, not a wrong answer.** Left unchanged so the score is not inflated; a looser pattern would be `staff|front-desk|team`. |
+| Run A (clean) | 28 / 30 | ph-05, hs-05 |
+| Run B (clean, same code + per-drug search rule) | 27 / 30 | ph-05, fn-06, hs-05 |
+| Run C — final (clean, + per-entity search, + 90 s timeout) | 30 / 30 | none |
 
-### How the numbers moved across runs (same 50 cases)
-| Run | Condition | Retrieval | Answer-cases passed |
-|---|---|---|---|
-| Keyword-only (no embeddings, quota out) | first embedding model unavailable | 67–83 % | 24 of 30 (Arabic: 1 of 5) |
-| Previous run | `embedding-2`, quota out again → degraded | 100 % | 28 of 30 (Arabic: 5 of 5; cached query vectors) |
-| **This run** | `embedding-2`, clean | **100 %** | **28 of 30** (Arabic: 5 of 5) |
+* The stable result across all three runs is the **safety side**: hallucination 0 %, refusal 100 %, retrieval 100 %. Those did not move.
+* The **answer side varies by 0–3 cases per run** (90–100 %). A realistic reading is "about 27–30 of 30", not a guaranteed 30.
+* What changed between runs, honestly:
+  * **ph-05** (amiodarone + warfarin) failed in A and B, passes in C. Cause: the agent searched the two drugs only together and got a generic literature summary. Fix: for questions naming 2+ entities the agent now also retrieves each entity's own documents (`agent.py`, step 3b), and the pharma prompt asks for one search per drug. Verified 3/3 on repeated manual runs, not just once.
+  * **hs-05** (what guests praise) failed in A–B because the test requires the literal word "staff" while the model sometimes writes "front-desk team". Passing in C is wording luck, not a fix. The test was left unchanged.
+  * **fn-06** (Arabic NVIDIA revenue trend) failed once with "no evidence" in B and passed on every manual retry and in C. The cause of the single failure was **not identified** (a 504 timeout was seen in a manual retry, but the eval case itself returned a normal `no_evidence`, not an error), so it should be treated as an occasional flaky case.
+* A hung model call once froze a run for ~90 minutes. All model calls now have a 90 s timeout.
 
 ### History: the earlier measurement with working embeddings (before the last fixes)
 Retrieval accuracy was **100 % in all five sectors** with `gemini-embedding-2`, including the Arabic cases (similarity 0.63–0.82 vs. 0.40–0.48 for unrelated text), up from 67–83 % with the first embedding model. Hallucination was 0 % in four sectors; the one non-zero case (Hospitality, spa price, 12.5 %) was a "no evidence" question the agent answered; after the later grounding fix it declines correctly in spot-checks, but this is **not yet confirmed by a full clean run**.

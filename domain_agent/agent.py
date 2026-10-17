@@ -145,6 +145,17 @@ class DomainAgent:
                                    sources=[],
                                    confidence={"score": 0.0, "level": "n/a", "parts": {"retrieval": 0.0}, "reasons": ["No evidence found in the knowledge base"]})
 
+            # ---- 3b. multi-entity questions: make sure EACH named entity was searched on its own.
+            # (A combined query can be answered from one document only; the model does not always search per entity.)
+            named = [e for e in find_entities(question, self.retriever.entities, self.domain.aliases) if "-" not in e]
+            if len(named) >= 2:
+                seen = {h.chunk.entity for h in ctx.evidence.values()}
+                for e in named:
+                    if sum(1 for h in ctx.evidence.values() if h.chunk.entity == e) < 2:
+                        for h in self.retriever.search(question, k=3, entities=[e]):
+                            ctx.register(h)
+                        ev("action", tool="auto_entity_search", args={"entity": e})
+
             # ---- 4. structured answer
             evidence_block = "\n\n".join(f"[{sid}] {h.chunk.label}\n{h.chunk.text[:1100]}" for sid, h in ctx.evidence.items())
             final_msgs = ([Msg("user", f"QUESTION: {question}\n\nSOURCES (the only facts you may use):\n{evidence_block}\n\nReturn the JSON answer.")])
