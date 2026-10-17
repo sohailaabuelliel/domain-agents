@@ -48,4 +48,4 @@ Open **Checklist & spec** (requirement → where it is implemented) and the eval
 | Arabic question → "no evidence" | Arabic vs English similarity under threshold | Rephrase with the English term, or see `EVALUATION.md` |
 
 ## Recorded demo
-A 1-minute recording of the real UI is in [`media/demo.mp4`](media/demo.mp4).
+A 1-minute recording of the real UI (new design) is in [`media/demo.mp4`](media/demo.mp4). Waiting time while the agent works is sped up 8× and labelled on screen.

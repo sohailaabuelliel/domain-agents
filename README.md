@@ -2,7 +2,7 @@
 
 [![tests](https://github.com/sohailaabuelliel/domain-agents/actions/workflows/tests.yml/badge.svg)](https://github.com/sohailaabuelliel/domain-agents/actions)
 
-**▶ 1-minute demo video:** [`docs/media/demo.mp4`](docs/media/demo.mp4) — recorded from the real running UI: a cited Pharma answer, a guardrail refusal, an honest "no evidence", an Arabic question over English SEC filings, and the built-in checklist/docs.
+**▶ 1-minute demo video:** [`docs/media/demo.mp4`](docs/media/demo.mp4) — recorded from the real running UI (new design): a cited Pharma answer, a guardrail refusal, an honest "no evidence", an Arabic question over English SEC filings, the English/Arabic UI switch, Settings with the live model list, and the built-in checklist/docs. Waiting time while the agent works is shown at 8× speed and labelled on screen.
 
 A single agent engine that is re-pointed at a different sector **by configuration only** (YAML + a folder of knowledge files — no code changes). Five sectors ship ready to use:
 
